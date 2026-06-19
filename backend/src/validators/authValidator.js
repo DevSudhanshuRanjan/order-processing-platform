@@ -9,6 +9,7 @@ export const registerValidator = [
     .withMessage("Name must be between 3 and 50 characters"),
 
   body("email")
+    .trim()
     .isEmail()
     .withMessage("Valid email required")
     .normalizeEmail(),
