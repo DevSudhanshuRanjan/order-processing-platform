@@ -1,0 +1,69 @@
+# ==========================================
+# Operating System Files (System Junk)
+# ==========================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+references/
+
+# Linux
+.fuse_hidden*
+.directory
+.trash/
+
+# ==========================================
+# IDEs and Editors
+# ==========================================
+# VS Code
+.vscode/
+!.vscode/extensions.json
+
+# IntelliJ / WebStorm / PyCharm
+.idea/
+*.iws
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+
+# ==========================================
+# Common Dependencies & Build Artifacts
+# ==========================================
+# Node / JavaScript
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+build/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+ENV/
+
+# Compiled Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+*.out
+
+# ==========================================
+# Logs, Environment, and Secrets
+# ==========================================
+*.log
+.env
+.env.local
+.env.*.local
+config/jwt/
