@@ -14,21 +14,14 @@ const buildSort = (sort) => {
     case "z_a":
       return { name: -1 };
 
+    case "newest":
     default:
       return { createdAt: -1 };
   }
 };
 
-export const getAllProducts = async (
-  queryParams
-) => {
-  const {
-    search,
-    category,
-    sort,
-    page = 1,
-    limit = 8,
-  } = queryParams;
+export const getAllProducts = async (queryParams) => {
+  const { search, category, sort, page = 1, limit = 8 } = queryParams;
 
   const query = {
     status: "active",
@@ -36,24 +29,9 @@ export const getAllProducts = async (
 
   if (search) {
     query.$or = [
-      {
-        name: {
-          $regex: search,
-          $options: "i",
-        },
-      },
-      {
-        description: {
-          $regex: search,
-          $options: "i",
-        },
-      },
-      {
-        category: {
-          $regex: search,
-          $options: "i",
-        },
-      },
+      { name: { $regex: search, $options: "i" } },
+      { description: { $regex: search, $options: "i" } },
+      { category: { $regex: search, $options: "i" } },
     ];
   }
 
@@ -61,48 +39,43 @@ export const getAllProducts = async (
     query.category = category;
   }
 
-  const products = await Product.find(query)
-    .select(
-      "name description price category image stock vendorId"
-    )
-    .sort(buildSort(sort))
-    .skip((page - 1) * limit)
-    .limit(Number(limit));
+  const limitNum = Number(limit);
+  const pageNum = Number(page);
 
-  const totalProducts =
-    await Product.countDocuments(query);
+  const products = await Product.find(query)
+    .select("name price category image stock")
+    .populate("vendorId")
+    .sort(buildSort(sort))
+    .skip((pageNum - 1) * limitNum)
+    .limit(limitNum);
+
+  const totalProducts = await Product.countDocuments(query);
 
   return {
+    success: true,
     products,
+    data: products,
+    page: pageNum,
+    totalPages: Math.ceil(totalProducts / limitNum),
     totalProducts,
-    totalPages: Math.ceil(
-      totalProducts / limit
-    ),
-    page: Number(page),
+    total: totalProducts,
   };
 };
 
 export const getProduct = async (id) => {
-  return Product.findById(id).select(
-    "name description price category image stock"
-  );
+  return Product.findById(id)
+    .select("name description price category image stock")
+    .populate("vendorId");
 };
 
-export const create = async (
-  data,
-  vendorId
-) => {
+export const create = async (data, vendorId) => {
   return Product.create({
     ...data,
     vendorId,
   });
 };
 
-export const update = async (
-  id,
-  data,
-  vendorId
-) => {
+export const update = async (id, data, vendorId) => {
   return Product.findOneAndUpdate(
     {
       _id: id,
@@ -111,14 +84,11 @@ export const update = async (
     data,
     {
       new: true,
-    }
+    },
   );
 };
 
-export const remove = async (
-  id,
-  vendorId
-) => {
+export const remove = async (id, vendorId) => {
   return Product.findOneAndUpdate(
     {
       _id: id,
@@ -129,15 +99,14 @@ export const remove = async (
     },
     {
       new: true,
-    }
+    },
   );
 };
 
-export const getVendorProducts =
-  async (vendorId) => {
-    return Product.find({
-      vendorId,
-    }).select(
-      "name price stock status"
-    );
-  };
+export const getVendorProducts = async (vendorId) => {
+  return Product.find({
+    vendorId,
+  })
+    .select("name price stock status")
+    .populate("vendorId");
+};
