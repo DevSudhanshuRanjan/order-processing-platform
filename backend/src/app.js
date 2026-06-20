@@ -5,6 +5,7 @@ import morgan from "morgan";
 import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
+import serviceAreaRoutes from "./routes/serviceAreaRoutes.js";
 
 import errorMiddleware from "./middlewares/errorMiddleware.js";
 
@@ -17,6 +18,7 @@ app.use(morgan("dev"));
 app.use("/api/auth", authRoutes);
 app.use("/api", productRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/service-areas", serviceAreaRoutes);
 
 app.use(errorMiddleware);
 

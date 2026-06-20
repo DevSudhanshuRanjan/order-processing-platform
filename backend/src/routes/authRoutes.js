@@ -40,11 +40,10 @@ router.post(
   login
 );
 
-// For testing puropose only
+// for testing puropose only
 import authMiddleware from "../middlewares/authMiddleware.js";
 import roleMiddleware from "../middlewares/roleMiddleware.js";
 
-// Temporary test routes
 router.get("/test-profile", authMiddleware, (req, res) => {
   res.status(200).json({ success: true, user: req.user });
 });

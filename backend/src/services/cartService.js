@@ -38,7 +38,7 @@ export const addItem = async (userId, productId, quantity = 1) => {
 
   if (existingItem) {
     if (existingItem.quantity + quantity > product.stock) {
-      throw new Error("Quantity Exceeds Available Stock");
+      throw new AppError("Quantity Exceeds Available Stock", 400);
     }
     existingItem.quantity += quantity;
   } else {
