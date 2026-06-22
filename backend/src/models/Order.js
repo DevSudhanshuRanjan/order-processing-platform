@@ -124,13 +124,7 @@ orderSchema.index({
 
 orderSchema.index({
   vendorId: 1,
-});
-
-orderSchema.index({
   status: 1,
-});
-
-orderSchema.index({
   createdAt: -1,
 });
 

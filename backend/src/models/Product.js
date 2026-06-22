@@ -66,16 +66,15 @@ productSchema.index({
   description: "text",
 });
 
-productSchema.index({
-  category: 1,
-});
+// productSchema.index({
+//   category: 1,
+// });
 
 productSchema.index({
   vendorId: 1,
-});
-
-productSchema.index({
   status: 1,
+  createdAt: -1,
+  category: 1,
 });
 
 const Product = mongoose.model(
