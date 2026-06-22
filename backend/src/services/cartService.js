@@ -32,6 +32,17 @@ export const addItem = async (userId, productId, quantity = 1) => {
     return cart;
   }
 
+  if (cart && cart.items.length > 0) {
+    const firstItem = await Product.findById(cart.items[0].productId);
+
+    if (
+      firstItem &&
+      firstItem.vendorId.toString() !== product.vendorId.toString()
+    ) {
+      throw new AppError("You Can Only Order From One Vendor At A Time", 400);
+    }
+  }
+
   const existingItem = cart.items.find(
     (item) => item.productId.toString() === productId.toString(),
   );
