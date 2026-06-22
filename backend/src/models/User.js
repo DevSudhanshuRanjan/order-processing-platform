@@ -48,6 +48,13 @@ userSchema.pre("save", async function () {
   this.password = await bcrypt.hash(this.password, 10);
 });
 
+userSchema.index({
+  role: 1,
+  status: 1,
+  email: 1,
+  createdAt: -1,
+});
+
 const User = mongoose.model("User", userSchema);
 
 export default User;

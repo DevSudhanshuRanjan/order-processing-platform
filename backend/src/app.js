@@ -8,6 +8,7 @@ import cartRoutes from "./routes/cartRoutes.js";
 import serviceAreaRoutes from "./routes/serviceAreaRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import vendorRoutes from "./routes/vendorRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 import errorMiddleware from "./middlewares/errorMiddleware.js";
 
@@ -23,6 +24,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/service-areas", serviceAreaRoutes);
 app.use("/api", orderRoutes);
 app.use("/api", vendorRoutes);
+app.use("/api", adminRoutes);
 
 app.use(errorMiddleware);
 
