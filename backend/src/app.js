@@ -5,10 +5,11 @@ import morgan from "morgan";
 import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
-import serviceAreaRoutes from "./routes/serviceAreaRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
-import vendorRoutes from "./routes/vendorRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import serviceAreaRoutes from "./routes/serviceAreaRoutes.js";
+import vendorRoutes from "./routes/vendorRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 import errorMiddleware from "./middlewares/errorMiddleware.js";
 
@@ -19,12 +20,13 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 app.use("/api/auth", authRoutes);
-app.use("/api", productRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/admin", adminRoutes);
 app.use("/api/service-areas", serviceAreaRoutes);
-app.use("/api", orderRoutes);
-app.use("/api", vendorRoutes);
-app.use("/api", adminRoutes);
+app.use("/api/vendor", vendorRoutes);
+app.use("/api", productRoutes); // Keep at bottom if it has catch-all or standard product routes
 
 app.use(errorMiddleware);
 
