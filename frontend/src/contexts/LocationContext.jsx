@@ -3,13 +3,13 @@ import * as turf from '@turf/turf';
 
 const LocationContext = createContext();
 
-// Hardcoded Delhi Zone polygon for MVP
+// Hardcoded Delhi Zone polygon for MVP - Expanded to cover entire Delhi
 export const DELI_ZONE_POLYGON = [
-  [77.20, 28.60],
-  [77.21, 28.61],
-  [77.24, 28.63],
-  [77.25, 28.58],
-  [77.20, 28.60] // Close the polygon
+  [76.84, 28.88], // North-West
+  [77.34, 28.88], // North-East
+  [77.34, 28.40], // South-East
+  [76.84, 28.40], // South-West
+  [76.84, 28.88]  // Close the polygon
 ];
 
 export const LocationProvider = ({ children }) => {

@@ -146,7 +146,7 @@ const Checkout = () => {
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                       attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                     />
-                    <Polygon positions={DELI_ZONE_POLYGON} pathOptions={{ color: '#F97316', fillColor: '#F97316', fillOpacity: 0.2 }} />
+                    <Polygon positions={DELI_ZONE_POLYGON.map(coord => [coord[1], coord[0]])} pathOptions={{ color: '#F97316', fillColor: '#F97316', fillOpacity: 0.2 }} />
                     <LocationMarker position={position} setPosition={setPosition} checkServiceability={checkServiceability} />
                     <MapUpdater center={position} />
                   </MapContainer>
