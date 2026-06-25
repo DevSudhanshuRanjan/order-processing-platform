@@ -67,3 +67,5 @@ ENV/
 .env.local
 .env.*.local
 config/jwt/
+Software Requirement Document (Frontend Team)/
+design/
