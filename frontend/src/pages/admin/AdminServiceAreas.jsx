@@ -3,19 +3,15 @@ import { getServiceAreas } from '../../services/adminService';
 import toast from '../../components/dashboard/Toast';
 import { MapContainer, TileLayer, Polygon, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import { DELI_ZONE_POLYGON } from '../../contexts/LocationContext';
 
 const AdminServiceAreas = () => {
   const [areas, setAreas] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // Dummy coordinates for Leaflet demo polygons
+  // Use the MVP expanded Delhi zone polygon for the first area
   const defaultPolygons = [
-    [
-      [28.6139, 77.2090],
-      [28.6239, 77.2090],
-      [28.6239, 77.2190],
-      [28.6139, 77.2190]
-    ],
+    DELI_ZONE_POLYGON.map(coord => [coord[1], coord[0]]),
     [
       [28.5939, 77.2290],
       [28.6039, 77.2290],
