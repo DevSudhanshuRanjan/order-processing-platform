@@ -32,10 +32,10 @@ const productSchema = new mongoose.Schema(
       required: true,
       enum: CATEGORIES,
     },
-    image: {
+    images: [{
       type: String,
       required: true,
-    },
+    }],
     stock: {
       type: Number,
       required: true,

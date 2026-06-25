@@ -20,8 +20,12 @@ export const createProductValidator = [
       "Chinese",
     ]),
 
-  body("image")
-    .isURL(),
+  body("images")
+    .isArray({ min: 1 })
+    .withMessage("Images must be an array of at least 1 image"),
+  body("images.*")
+    .isURL()
+    .withMessage("Each image must be a valid URL"),
 
   body("stock")
     .isInt({ min: 0 }),
@@ -51,7 +55,10 @@ export const updateProductValidator = [
       "Chinese",
     ]),
 
-  body("image")
+  body("images")
+    .optional()
+    .isArray({ min: 1 }),
+  body("images.*")
     .optional()
     .isURL(),
 
