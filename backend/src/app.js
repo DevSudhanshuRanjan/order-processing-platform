@@ -22,10 +22,10 @@ app.use(morgan("dev"));
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/cart", cartRoutes);
-app.use("/api/orders", orderRoutes);
-app.use("/api/admin", adminRoutes);
 app.use("/api/service-areas", serviceAreaRoutes);
-app.use("/api/vendor", vendorRoutes);
+app.use("/api", orderRoutes);
+app.use("/api", adminRoutes);
+app.use("/api", vendorRoutes);
 app.use("/api", productRoutes); // Keep at bottom if it has catch-all or standard product routes
 
 app.use(errorMiddleware);

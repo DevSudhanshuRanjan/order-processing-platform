@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 import Product from "../models/Product.js";
 import User from "../models/User.js";
+import ServiceArea from "../models/ServiceArea.js";
 
 dotenv.config();
 
@@ -56,6 +57,20 @@ const seedDatabase = async () => {
       });
       await vendor.save();
     }
+
+    // Seed Service Area (Delhi MVP)
+    await ServiceArea.deleteMany();
+    await ServiceArea.create({
+      name: "Delhi MVP Zone",
+      polygon: [
+        [76.84, 28.88], // North-West
+        [77.34, 28.88], // North-East
+        [77.34, 28.40], // South-East
+        [76.84, 28.40], // South-West
+        [76.84, 28.88]  // Close the polygon
+      ]
+    });
+    console.log("Service Area seeded.");
 
     const dummyProducts = [
       // BURGERS
