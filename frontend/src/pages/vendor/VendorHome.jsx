@@ -59,24 +59,24 @@ const VendorHome = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard 
           label="Total Revenue" 
-          value={stats?.revenue} 
+          value={stats?.stats?.revenue} 
           prefix="₹" 
           icon="payments" 
           color="#10B981"
-          trendValue={`+${stats?.growth}% from yesterday`}
+          trendValue={`+${stats?.stats?.growth}% from yesterday`}
           trendUp={true}
         />
         <StatsCard 
           label="Active Orders" 
-          value={stats?.orders} 
+          value={stats?.stats?.deliveredOrders} 
           icon="shopping_bag" 
           color="#3B82F6"
           trendValue="+5% from yesterday"
           trendUp={true}
         />
         <StatsCard 
-          label="New Customers" 
-          value={stats?.customers} 
+          label="Total Products" 
+          value={stats?.stats?.totalProducts} 
           icon="group" 
           color="#EC4899"
           trendValue="-2% from yesterday"
@@ -84,7 +84,7 @@ const VendorHome = () => {
         />
         <StatsCard 
           label="Pending Orders" 
-          value={stats?.pendingOrders} 
+          value={stats?.stats?.pendingOrders} 
           icon="schedule" 
           color="#F59E0B"
         />
@@ -94,12 +94,12 @@ const VendorHome = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6">
           <h3 className="font-label-md text-label-md text-white mb-6">Revenue Over Time</h3>
-          <AreaChart data={stats?.revenueData || []} prefix="₹" />
+          <AreaChart data={stats?.stats?.revenueData || []} prefix="₹" />
         </div>
         
         <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6">
           <h3 className="font-label-md text-label-md text-white mb-6">Top Categories</h3>
-          <DonutChart data={stats?.topCategories || []} />
+          <DonutChart data={stats?.stats?.topCategories || []} />
         </div>
       </div>
 
@@ -122,7 +122,7 @@ const VendorHome = () => {
                 </tr>
               </thead>
               <tbody className="text-white font-body-md text-sm">
-                {(stats?.recentOrders || []).map(order => (
+                {(stats?.stats?.recentOrders || []).map(order => (
                   <tr key={order._id} className="border-b border-white/5 hover:bg-white/10 transition-colors">
                     <td className="p-4 pl-6 font-mono text-xs text-on-primary-container">{order._id}</td>
                     <td className="p-4 font-medium">{order.customerName}</td>
@@ -141,7 +141,7 @@ const VendorHome = () => {
         {/* Weekly Orders Bar Chart */}
         <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6">
           <h3 className="font-label-md text-label-md text-white mb-6">Weekly Orders</h3>
-          <BarChart data={stats?.ordersData || []} height={250} color="#8B5CF6" />
+          <BarChart data={stats?.stats?.ordersData || []} height={250} color="#8B5CF6" />
         </div>
       </div>
     </div>

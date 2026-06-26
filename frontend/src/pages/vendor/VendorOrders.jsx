@@ -77,8 +77,8 @@ const VendorOrders = () => {
       key: 'customerName',
       render: (row) => (
         <div>
-          <span className="font-medium text-white block">{row.customerName}</span>
-          <span className="text-xs text-on-primary-container">{row.customerContact}</span>
+          <span className="font-medium text-white block">{row?.userId?.name}</span>
+          <span className="text-xs text-on-primary-container">{row?.userId?.email}</span>
         </div>
       )
     },
@@ -97,7 +97,7 @@ const VendorOrders = () => {
     { 
       header: 'Total', 
       key: 'totalAmount',
-      render: (row) => <span className="font-mono font-medium text-white">₹{row.totalAmount}</span>
+      render: (row) => <span className="font-mono font-medium text-white">₹{Math.round(row.total * 100) / 100}</span>
     },
     { 
       header: 'Status', 
@@ -195,7 +195,7 @@ const VendorOrders = () => {
           <div className="space-y-4">
             <p>Update status for Order <span className="font-mono">{selectedOrder._id}</span></p>
             <div className="grid grid-cols-2 gap-3 mt-4">
-              {['Pending', 'Preparing', 'Out for Delivery', 'Delivered', 'Cancelled'].map(s => (
+              {['Pending', 'Preparing', 'Out For Delivery', 'Delivered', 'Cancelled'].map(s => (
                 <button
                   key={s}
                   onClick={() => handleUpdateStatus(selectedOrder._id, s)}
