@@ -147,6 +147,8 @@ export const getVendorOrders =
         "userId",
         "name email"
       )
+      .populate("vendorId")
+      .populate("userId")
       .sort({
         createdAt: -1,
       });
