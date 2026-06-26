@@ -50,7 +50,7 @@ app.use("/api", vendorRoutes);
 app.use("/api", productRoutes);
 
 // 404 handler for unmatched API routes
-app.use("/api/*", (req, res) => {
+app.use((req, res) => {
   res.status(404).json({
     success: false,
     message: "API endpoint not found",
