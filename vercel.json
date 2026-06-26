@@ -19,6 +19,10 @@
       "dest": "/backend/api/index.js"
     },
     {
+      "src": "/(assets/.*|.*\\.(png|jpg|jpeg|gif|svg|ico|css|js|woff|woff2|ttf|eot|mp4|webm))",
+      "dest": "/frontend/$1"
+    },
+    {
       "handle": "filesystem"
     },
     {
