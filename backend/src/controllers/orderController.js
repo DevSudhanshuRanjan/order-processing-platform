@@ -20,7 +20,8 @@ export const placeOrder =
         await orderService.placeOrder(
           req.user.id,
           req.body.address,
-          req.body.location
+          req.body.location,
+          req.body.items
         );
 
       return res.status(200).json({

@@ -33,131 +33,92 @@ export const placeOrder =
   async (
     userId,
     address,
-    location
+    location,
+    clientItems
   ) => {
     await validateDeliveryLocation(
       location.latitude,
       location.longitude
     );
 
-    const cart =
-      await Cart.findOne({
-        userId,
-      }).populate({
-        path: "items.productId",
-      });
+    let itemsToProcess = [];
+    let cart = null;
 
-    if (
-      !cart ||
-      cart.items.length === 0
-    ) {
-      throw new AppError(
-        "Cart Is Empty",
-        400
-      );
+    if (clientItems && clientItems.length > 0) {
+      itemsToProcess = clientItems;
+    } else {
+      cart = await Cart.findOne({ userId }).populate({ path: "items.productId" });
+      if (cart) itemsToProcess = cart.items;
     }
 
-    const session =
-      await mongoose.startSession();
+    if (!itemsToProcess || itemsToProcess.length === 0) {
+      throw new AppError("Cart Is Empty", 400);
+    }
 
+    const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
       let subtotal = 0;
-
       const items = [];
+      let vendorId = null;
 
-      const vendorId =
-        cart.items[0].productId.vendorId;
-
-      for (const item of cart.items) {
-        const product =
-          await Product.findById(
-            item.productId._id
-          ).session(session);
+      for (const item of itemsToProcess) {
+        const prodId = item.productId._id || item.productId;
+        const product = await Product.findById(prodId).session(session);
 
         if (!product) {
-          throw new AppError(
-            "Product Not Found",
-            404
-          );
+          throw new AppError("Product Not Found", 404);
         }
 
-        if (
-          product.stock <
-          item.quantity
-        ) {
-          throw new AppError(
-            "Insufficient Stock",
-            400
-          );
+        if (product.stock < item.quantity) {
+          throw new AppError("Insufficient Stock", 400);
         }
 
-        subtotal +=
-          product.price *
-          item.quantity;
+        if (!vendorId) {
+          vendorId = product.vendorId;
+        } else if (vendorId.toString() !== product.vendorId.toString()) {
+           throw new AppError("Orders can only contain items from a single vendor", 400);
+        }
 
+        subtotal += product.price * item.quantity;
         items.push({
-          productId:
-            product._id,
-          name:
-            product.name,
-          price:
-            product.price,
-          quantity:
-            item.quantity,
+          productId: product._id,
+          name: product.name,
+          price: product.price,
+          quantity: item.quantity,
         });
       }
 
       const deliveryFee = 40;
-      const tax =
-        subtotal * 0.05;
+      const tax = subtotal * 0.05;
+      const total = subtotal + deliveryFee + tax;
 
-      const total =
-        subtotal +
-        deliveryFee +
-        tax;
+      const order = await Order.create([{
+        userId,
+        vendorId,
+        items,
+        address,
+        location,
+        total,
+        status: "Pending",
+      }], { session });
 
-      const order =
-        await Order.create(
-          [
-            {
-              userId,
-              vendorId,
-              items,
-              address,
-              location,
-              total,
-              status:
-                "Pending",
-            },
-          ],
-          { session }
-        );
-
-      for (const item of cart.items) {
+      for (const item of itemsToProcess) {
+        const prodId = item.productId._id || item.productId;
         await Product.findByIdAndUpdate(
-          item.productId._id,
-          {
-            $inc: {
-              stock:
-                -item.quantity,
-            },
-          },
-          {
-            session,
-          }
+          prodId,
+          { $inc: { stock: -item.quantity } },
+          { session }
         );
       }
 
-      cart.items = [];
-
-      await cart.save({
-        session,
-      });
+      if (cart) {
+        cart.items = [];
+        await cart.save({ session });
+      }
 
       await session.commitTransaction();
-
       return order[0];
     } catch (error) {
       await session.abortTransaction();
