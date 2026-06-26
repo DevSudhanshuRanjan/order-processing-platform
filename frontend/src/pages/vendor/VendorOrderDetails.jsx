@@ -251,7 +251,7 @@ const VendorOrderDetails = () => {
         <div className="space-y-4">
           <p>Current Status: <StatusBadge status={order.status} /></p>
           <div className="grid grid-cols-2 gap-3 mt-4">
-            {['Pending', 'Preparing', 'Out for Delivery', 'Delivered', 'Cancelled'].map(s => (
+            {['Pending', 'Preparing', 'Out For Delivery', 'Delivered', 'Cancelled'].map(s => (
               <button
                 key={s}
                 onClick={() => handleUpdateStatus(s)}

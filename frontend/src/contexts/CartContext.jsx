@@ -1,9 +1,11 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import API from "../services/api";
+import { useAuth } from "../contexts/AuthContext";
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
+  const { role } = useAuth();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -25,10 +27,16 @@ export const CartProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    fetchCart();
-  }, []);
+    if (role === "customer") {
+      fetchCart();
+    }
+  }, [role]);
 
   const addToCart = async (product, quantity = 1) => {
+    if (role !== "customer") {
+      console.warn("Only customers can add items to cart");
+      return;
+    }
     try {
       const existing = cartItems.find((item) => item.productId === product._id);
       const targetQty = existing ? existing.quantity + quantity : quantity;
@@ -47,6 +55,10 @@ export const CartProvider = ({ children }) => {
   };
 
   const removeFromCart = async (productId) => {
+    if (role !== "customer") {
+      console.warn("Only customers can remove items from cart");
+      return;
+    }
     try {
       const res = await API.delete(`/cart/remove/${productId}`);
       if (res.data.success) {
@@ -58,6 +70,10 @@ export const CartProvider = ({ children }) => {
   };
 
   const increaseQuantity = async (productId) => {
+    if (role !== "customer") {
+      console.warn("Only customers can update cart quantity");
+      return;
+    }
     const item = cartItems.find((i) => i.productId === productId);
     if (!item) return;
 
@@ -81,6 +97,10 @@ export const CartProvider = ({ children }) => {
   };
 
   const decreaseQuantity = async (productId) => {
+    if (role !== "customer") {
+      console.warn("Only customers can update cart quantity");
+      return;
+    }
     const item = cartItems.find((i) => i.productId === productId);
     if (!item || item.quantity <= 1) return;
 
@@ -99,6 +119,10 @@ export const CartProvider = ({ children }) => {
   };
 
   const clearCart = () => {
+    if (role !== "customer") {
+      console.warn("Only customers can clear cart");
+      return;
+    }
     setCartItems([]);
     localStorage.removeItem("cart");
   };
