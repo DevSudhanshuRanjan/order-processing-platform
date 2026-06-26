@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import DataTable from '../../components/dashboard/DataTable';
 import StatusBadge from '../../components/dashboard/StatusBadge';
 import SearchInput from '../../components/dashboard/SearchInput';
-import { getVendorOrders } from '../../services/vendorService'; // We reuse this for mock data, in reality admin has its own
+import { getAdminOrders } from '../../services/adminService'; // We reuse this for mock data, in reality admin has its own
 import toast from '../../components/dashboard/Toast';
 
 const AdminOrders = () => {
@@ -16,7 +16,8 @@ const AdminOrders = () => {
     setLoading(true);
     try {
       // Using vendor service as a mock fallback for admin orders
-      const data = await getVendorOrders({ search, page, limit: 15 });
+      const data = await getAdminOrders({ search, page, limit: 15 });
+      console.log(data);
       setOrders(data.orders);
       setTotalPages(data.totalPages);
     } catch (error) {

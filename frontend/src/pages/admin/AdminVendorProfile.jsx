@@ -86,7 +86,7 @@ const AdminVendorProfile = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <StatsCard 
               label="Total Orders" 
-              value={vendor.totalOrders} 
+              value={vendor.orders} 
               icon="shopping_bag" 
               color="#3B82F6"
             />

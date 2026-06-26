@@ -13,7 +13,7 @@ const AdminHome = () => {
     const fetchStats = async () => {
       try {
         const data = await getAdminStats();
-        setStats(data);
+        setStats(data.stats);
       } catch (error) {
         console.error('Failed to fetch admin stats:', error);
       } finally {
@@ -51,7 +51,7 @@ const AdminHome = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard 
           label="Total Revenue" 
-          value={stats?.totalRevenue} 
+          value={stats?.revenue} 
           prefix="₹" 
           icon="account_balance" 
           color="#10B981"
@@ -60,7 +60,7 @@ const AdminHome = () => {
         />
         <StatsCard 
           label="Active Vendors" 
-          value={stats?.activeVendors} 
+          value={stats?.vendors} 
           icon="storefront" 
           color="#3B82F6"
           trendValue={`+${stats?.vendorGrowth}% (MoM)`}
@@ -68,7 +68,7 @@ const AdminHome = () => {
         />
         <StatsCard 
           label="Total Users" 
-          value={stats?.totalUsers} 
+          value={stats?.users} 
           icon="group" 
           color="#8B5CF6"
           trendValue={`+${stats?.userGrowth}% (MoM)`}
@@ -76,7 +76,7 @@ const AdminHome = () => {
         />
         <StatsCard 
           label="Active Orders" 
-          value={stats?.activeOrders} 
+          value={stats?.orders} 
           icon="local_shipping" 
           color="#F59E0B"
           trendValue={`+${stats?.orderGrowth}% (MoM)`}

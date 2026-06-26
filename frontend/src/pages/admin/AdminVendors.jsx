@@ -30,6 +30,7 @@ const AdminVendors = () => {
     setLoading(true);
     try {
       const data = await getAdminVendors({ search });
+      // console.log(data);
       let filtered = data.vendors;
       if (filter !== 'All') {
         filtered = filtered.filter(v => v.status === filter);
@@ -84,7 +85,7 @@ const AdminVendors = () => {
     { 
       header: 'Total Orders', 
       key: 'totalOrders',
-      render: (row) => <span className="text-white">{row.totalOrders.toLocaleString()}</span>
+      render: (row) => <span className="text-white">{row.orders?.toLocaleString()}</span>
     },
     { 
       header: 'Rating', 

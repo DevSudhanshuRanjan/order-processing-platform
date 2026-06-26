@@ -58,7 +58,7 @@ const MOCK_SERVICE_AREAS = [
 
 export const getAdminStats = async () => {
   try {
-    const response = await API.get('/admin/stats');
+    const response = await API.get('/admin/dashboard');
     return response.data;
   } catch (error) {
     if (!error.response || error.response.status === 404 || error.response.status === 403) {
@@ -71,6 +71,7 @@ export const getAdminStats = async () => {
 export const getAdminVendors = async (params = {}) => {
   try {
     const response = await API.get('/admin/vendors', { params });
+    console.log(response);
     return response.data;
   } catch (error) {
     if (!error.response || error.response.status === 404 || error.response.status === 403) {
@@ -152,6 +153,40 @@ export const getSystemHealth = async () => {
           memory: '62%',
           uptime: '15d 4h 23m'
         }
+      };
+    }
+    throw error;
+  }
+};
+
+export const getAdminOrders = async (params = {}) => {
+  try {
+    const response = await API.get('/admin/orders', { params });
+    return response.data;
+  } catch (error) {
+    if (!error.response || error.response.status === 404) {
+      let filtered = [...MOCK_ORDERS];
+      if (params.status && params.status !== 'All') {
+        filtered = filtered.filter(o => o.status === params.status);
+      }
+      if (params.search) {
+        filtered = filtered.filter(o => 
+          o._id.includes(params.search) || 
+          o.customerName.toLowerCase().includes(params.search.toLowerCase())
+        );
+      }
+      
+      const page = params.page || 1;
+      const limit = params.limit || 10;
+      const startIndex = (page - 1) * limit;
+      const paginated = filtered.slice(startIndex, startIndex + limit);
+      
+      return { 
+        success: true, 
+        orders: paginated, 
+        totalOrders: filtered.length,
+        totalPages: Math.ceil(filtered.length / limit),
+        page 
       };
     }
     throw error;
