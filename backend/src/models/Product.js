@@ -60,15 +60,8 @@ const productSchema = new mongoose.Schema(
 
 productSchema.index({
   name: "text",
-});
-
-productSchema.index({
   description: "text",
 });
-
-// productSchema.index({
-//   category: 1,
-// });
 
 productSchema.index({
   vendorId: 1,

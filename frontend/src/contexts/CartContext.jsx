@@ -53,7 +53,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  const deliveryFee = subtotal > 0 ? 50 : 0; // Flat fee for mock
+  const deliveryFee = subtotal > 0 ? 40 : 0; // Matches backend delivery fee
   const tax = subtotal * 0.05; // 5% mock tax
   const grandTotal = subtotal + deliveryFee + tax;
 

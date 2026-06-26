@@ -39,17 +39,4 @@ router.delete(
   removeServiceArea,
 );
 
-// for testing purposes only
-import { validateDeliveryLocation } from "../services/serviceAreaService.js";
-
-router.post("/test-validation", async (req, res, next) => {
-  try {
-    const { latitude, longitude } = req.body;
-    const result = await validateDeliveryLocation(latitude, longitude);
-    return res.status(200).json(result);
-  } catch (error) {
-    next(error);
-  }
-});
-
 export default router;

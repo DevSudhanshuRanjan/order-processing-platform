@@ -11,8 +11,7 @@ import Modal from '../../components/dashboard/Modal';
 const VENDOR_FILTERS = [
   { id: 'All', label: 'All Vendors' },
   { id: 'active', label: 'Active' },
-  { id: 'inactive', label: 'Inactive' },
-  { id: 'suspended', label: 'Suspended' },
+  { id: 'blocked', label: 'Blocked' },
 ];
 
 const AdminVendors = () => {
@@ -30,8 +29,7 @@ const AdminVendors = () => {
     setLoading(true);
     try {
       const data = await getAdminVendors({ search });
-      // console.log(data);
-      let filtered = data.vendors;
+      let filtered = data.vendors || [];
       if (filter !== 'All') {
         filtered = filtered.filter(v => v.status === filter);
       }
@@ -51,7 +49,7 @@ const AdminVendors = () => {
     setStatusUpdating(true);
     try {
       await updateVendorStatus(selectedVendor._id, newStatus);
-      toast.success(`Vendor status updated to ${newStatus}`);
+      toast.success(`Vendor ${newStatus === 'blocked' ? 'blocked' : 'unblocked'} successfully`);
       fetchVendors();
       setStatusModalOpen(false);
     } catch (error) {
@@ -78,24 +76,14 @@ const AdminVendors = () => {
       )
     },
     { 
-      header: 'Vendor ID', 
-      key: '_id',
-      render: (row) => <span className="font-mono text-xs text-on-primary-container">{row._id}</span>
+      header: 'Products', 
+      key: 'products',
+      render: (row) => <span className="text-white">{(row.products || 0).toLocaleString()}</span>
     },
     { 
-      header: 'Total Orders', 
-      key: 'totalOrders',
-      render: (row) => <span className="text-white">{row.orders?.toLocaleString()}</span>
-    },
-    { 
-      header: 'Rating', 
-      key: 'rating',
-      render: (row) => (
-        <div className="flex items-center gap-1 text-[#F59E0B]">
-          <span className="material-symbols-outlined text-[14px] icon-fill">star</span>
-          <span className="text-white text-sm">{row.rating}</span>
-        </div>
-      )
+      header: 'Orders', 
+      key: 'orders',
+      render: (row) => <span className="text-white">{(row.orders || 0).toLocaleString()}</span>
     },
     { 
       header: 'Status', 
@@ -162,7 +150,7 @@ const AdminVendors = () => {
         <div className="space-y-4">
           <p>Update access for <span className="text-white font-bold">{selectedVendor?.name}</span></p>
           <div className="grid grid-cols-1 gap-3 mt-4">
-            {['active', 'inactive', 'suspended'].map(s => (
+            {['active', 'blocked'].map(s => (
               <button
                 key={s}
                 onClick={() => handleUpdateStatus(s)}

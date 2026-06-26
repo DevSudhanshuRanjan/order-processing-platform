@@ -22,6 +22,7 @@ import Checkout from './pages/Checkout';
 import Orders from './pages/Orders';
 import OrderSuccess from './pages/OrderSuccess';
 import Profile from './pages/Profile';
+import NotFound from './pages/NotFound';
 
 // Dashboards
 import VendorDashboard from './pages/Vendor';
@@ -83,6 +84,9 @@ function AppContent() {
               </RoleRoute>
             } 
           />
+
+          {/* 404 Route */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       {!isDashboard && <Footer />}

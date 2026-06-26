@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import Product from "../models/Product.js";
 import User from "../models/User.js";
 import ServiceArea from "../models/ServiceArea.js";
@@ -48,11 +48,10 @@ const seedDatabase = async () => {
     let vendor = await User.findOne({ email: "vendor@auraeats.com" });
     if (!vendor) {
       console.log("Creating default vendor...");
-      const hashedPassword = await bcrypt.hash("vendor123", 10);
       vendor = new User({
         name: "Aura Vendor",
         email: "vendor@auraeats.com",
-        password: "vendor123", // Will be hashed again by pre-save hook
+        password: "Vendor123", // Will be hashed by pre-save hook
         role: "vendor",
       });
       await vendor.save();

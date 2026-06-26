@@ -67,7 +67,7 @@ export const addItem = async (userId, productId, quantity = 1) => {
 export const getUserCart = async (userId) => {
   const cart = await Cart.findOne({ userId }).populate({
     path: "items.productId",
-    select: "name price image stock",
+    select: "name price images stock",
   });
 
   return cart;

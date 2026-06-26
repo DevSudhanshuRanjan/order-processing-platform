@@ -91,7 +91,7 @@ const AdminUsers = () => {
     { 
       header: 'Joined', 
       key: 'joinedAt',
-      render: (row) => <span className="text-sm text-on-primary-container">{new Date(row.joinedAt).toLocaleDateString()}</span>
+      render: (row) => <span className="text-sm text-on-primary-container">{new Date(row.createdAt).toLocaleDateString()}</span>
     },
     { 
       header: 'Status', 

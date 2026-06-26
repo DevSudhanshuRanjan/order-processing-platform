@@ -48,7 +48,7 @@ export const getCart = async (req, res, next) => {
         productId: item.productId._id,
         name: item.productId.name,
         price: item.productId.price,
-        image: item.productId.image,
+        image: item.productId.images && item.productId.images.length > 0 ? item.productId.images[0] : null,
         quantity: item.quantity,
         stock: item.productId.stock,
       }));

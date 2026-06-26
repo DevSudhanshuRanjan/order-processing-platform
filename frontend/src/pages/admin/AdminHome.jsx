@@ -51,36 +51,28 @@ const AdminHome = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard 
           label="Total Revenue" 
-          value={stats?.revenue} 
+          value={stats?.stats?.revenue || 0}
           prefix="₹" 
           icon="account_balance" 
           color="#10B981"
-          trendValue={`+${stats?.revenueGrowth}% (MoM)`}
-          trendUp={true}
         />
         <StatsCard 
-          label="Active Vendors" 
-          value={stats?.vendors} 
+          label="Vendors" 
+          value={stats?.stats?.vendors || 0} 
           icon="storefront" 
           color="#3B82F6"
-          trendValue={`+${stats?.vendorGrowth}% (MoM)`}
-          trendUp={true}
         />
         <StatsCard 
-          label="Total Users" 
-          value={stats?.users} 
+          label="Customers" 
+          value={stats?.stats?.users || 0}
           icon="group" 
           color="#8B5CF6"
-          trendValue={`+${stats?.userGrowth}% (MoM)`}
-          trendUp={true}
         />
         <StatsCard 
-          label="Active Orders" 
-          value={stats?.orders} 
+          label="Total Orders" 
+          value={stats?.stats?.orders || 0} 
           icon="local_shipping" 
           color="#F59E0B"
-          trendValue={`+${stats?.orderGrowth}% (MoM)`}
-          trendUp={true}
         />
       </div>
 
