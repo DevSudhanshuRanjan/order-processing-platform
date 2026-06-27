@@ -68,7 +68,6 @@ const MOCK_PRODUCTS = [
 export const getVendorStats = async () => {
   try {
     const response = await API.get('/vendor/dashboard');
-    console.log(response.data);
     return response.data;
   } catch (error) {
     if (!error.response || error.response.status === 404) {
