@@ -21,11 +21,9 @@ export const createProductValidator = [
     ]),
 
   body("image")
-    .isArray({ min: 1 })
-    .withMessage("Images must be an array of at least 1 image"),
-  body("image.*")
-    .isURL()
-    .withMessage("Each image must be a valid URL"),
+    .optional()
+    .isMongoId()
+    .withMessage("Image must be a valid Image ID"),
 
   body("stock")
     .isInt({ min: 0 }),
@@ -57,10 +55,7 @@ export const updateProductValidator = [
 
   body("image")
     .optional()
-    .isArray({ min: 1 }),
-  body("image.*")
-    .optional()
-    .isURL(),
+    .isMongoId(),
 
   body("stock")
     .optional()

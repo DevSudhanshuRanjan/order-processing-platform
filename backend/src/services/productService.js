@@ -43,7 +43,7 @@ export const getAllProducts = async (queryParams) => {
   const pageNum = Number(page);
 
   const products = await Product.find(query)
-    .select("name price category images stock status")
+    .select("name price category image stock status")
     .populate("vendorId")
     .sort(buildSort(sort))
     .skip((pageNum - 1) * limitNum)
@@ -64,7 +64,7 @@ export const getAllProducts = async (queryParams) => {
 
 export const getProduct = async (id) => {
   return Product.findById(id)
-    .select("name description price category images stock")
+    .select("name description price category image stock")
     .populate("vendorId");
 };
 
@@ -107,6 +107,6 @@ export const getVendorProducts = async (vendorId) => {
   return Product.find({
     vendorId,
   })
-    .select("name price stock status")
+    .select("name price stock status image")
     .populate("vendorId");
 };

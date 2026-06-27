@@ -18,7 +18,7 @@ router.get("/:id", getImage);
 router.post(
   "/",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware("vendor"),
   uploadMiddleware,
   createImage
 );
@@ -26,7 +26,7 @@ router.post(
 router.patch(
   "/:id",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware("vendor"),
   uploadMiddleware,
   updateImage
 );
@@ -34,7 +34,7 @@ router.patch(
 router.delete(
   "/:id",
   authMiddleware,
-  roleMiddleware("admin"),
+  roleMiddleware("vendor"),
   deleteImage
 );
 

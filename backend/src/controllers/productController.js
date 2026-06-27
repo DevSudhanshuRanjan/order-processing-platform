@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { validationResult } from "express-validator";
 
 import * as productService from "../services/productService.js";
+import { uploadMiddleware, createImage as uploadImage } from "../controllers/imageController.js";
 
 export const getProducts = async (
   req,
@@ -69,10 +70,14 @@ export const getProductById =
 export const createProduct =
   async (req, res, next) => {
     try {
+      console.log('Create Product - Request body:', req.body);
+      console.log('Create Product - Request files:', req.files);
+      
       const errors =
         validationResult(req);
 
       if (!errors.isEmpty()) {
+        console.log('Validation errors:', errors.array());
         return res.status(400).json({
           success: false,
           message:
@@ -80,8 +85,25 @@ export const createProduct =
         });
       }
 
+      let imageId = req.body.image || null;
+      
+      if (req.files && req.files.length > 0) {
+        const result = await uploadImage({ 
+          file: req.files[0], 
+          res: { status: () => ({ json: () => {} }) }, 
+          next 
+        });
+        // Extract the image ID from the result
+        imageId = result.image.id;
+      }
+
+      const productData = {
+        ...req.body,
+        image: imageId
+      };
+
       await productService.create(
-        req.body,
+        productData,
         req.user.id
       );
 
@@ -108,10 +130,26 @@ export const updateProduct =
         });
       }
 
+      let imageId = req.body.image || null;
+      
+      if (req.files && req.files.length > 0) {
+        const result = await uploadImage({ 
+          file: req.files[0], 
+          res: { status: () => ({ json: () => {} }) }, 
+          next 
+        });
+        imageId = result.image.id;
+      }
+
+      const productData = {
+        ...req.body,
+        ...(imageId && { image: imageId })
+      };
+
       const product =
         await productService.update(
           req.params.id,
-          req.body,
+          productData,
           req.user.id
         );
 
