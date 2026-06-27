@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../contexts/CartContext";
 import { useAuth } from "../contexts/AuthContext";
+import { getImageUrl } from "../services/vendorService";
 import toast from "react-hot-toast";
 
 const ProductCard = ({ product }) => {
@@ -36,9 +37,11 @@ const ProductCard = ({ product }) => {
         <img
           className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
           src={
-            product.images && product.images.length > 0
-              ? product.images[0]
-              : "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80"
+            product.image 
+              ? getImageUrl(product.image)
+              : product.images && product.images.length > 0
+                ? (typeof product.images[0] === 'string' ? getImageUrl(product.images[0]) : product.images[0])
+                : "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80"
           }
           alt={product.name}
           loading="lazy"

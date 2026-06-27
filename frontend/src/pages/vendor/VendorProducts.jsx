@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import DataTable from '../../components/dashboard/DataTable';
 import StatusBadge from '../../components/dashboard/StatusBadge';
 import SearchInput from '../../components/dashboard/SearchInput';
-import { getVendorProducts, deleteProduct } from '../../services/vendorService';
+import { getVendorProducts, deleteProduct, getImageUrl } from '../../services/vendorService';
 import toast from '../../components/dashboard/Toast';
 import Modal from '../../components/dashboard/Modal';
 
@@ -51,16 +51,35 @@ const VendorProducts = () => {
     {
       header: 'Product',
       key: 'name',
-      render: (row) => (
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg overflow-hidden bg-[#1a1c1c] flex-shrink-0">
-            <img className="w-full h-full object-cover" alt={row.name} src={row.image} />
+      render: (row) => {
+        // Image is stored as ID only, use GET /api/images/:id to fetch
+        let imageSrc = '/placeholder.png';
+        
+        if (row.image) {
+          // row.image is the image ID (not populated)
+          imageSrc = getImageUrl(row.image);
+        }
+        // Fallback for old array format
+        else if (row.images && row.images.length > 0) {
+          const image = row.images[0];
+          if (typeof image === 'string') {
+            imageSrc = getImageUrl(image);
+          } else if (image._id) {
+            imageSrc = getImageUrl(image._id);
+          }
+        }
+        
+        return (
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg overflow-hidden bg-[#1a1c1c] flex-shrink-0">
+              <img className="w-full h-full object-cover" alt={row.name} src={imageSrc} />
+            </div>
+            <div>
+              <span className="font-label-md text-white block">{row.name}</span>
+            </div>
           </div>
-          <div>
-            <span className="font-label-md text-white block">{row.name}</span>
-          </div>
-        </div>
-      )
+        );
+      }
     },
     { 
       header: 'Price', 

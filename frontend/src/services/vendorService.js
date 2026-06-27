@@ -1,5 +1,13 @@
 import API from './api';
 
+// Helper to get the correct image URL
+export const getImageUrl = (imageId) => {
+  const baseURL = import.meta.env.PROD 
+    ? '/api' 
+    : (import.meta.env.VITE_API_URL || 'http://localhost:5000/api');
+  return `${baseURL}/images/${imageId}`;
+};
+
 // --- MOCK DATA ---
 const MOCK_VENDOR_STATS = {
   revenue: 24500,
@@ -159,11 +167,59 @@ export const getVendorProducts = async (params = {}) => {
   }
 };
 
-export const createProduct = async (data) => {
+export const uploadImage = async (file) => {
   try {
-    const response = await API.post('/vendor/products', data);
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    const response = await API.post('/images', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   } catch (error) {
+    if (!error.response || error.response.status === 404) {
+      // Mock response for development
+      return { 
+        success: true, 
+        image: { 
+          id: 'IMG' + Date.now(),
+          contentType: 'image/avif',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        } 
+      };
+    }
+    throw error;
+  }
+};
+
+export const createProduct = async (data, imageFiles = []) => {
+  try {
+    // Upload single image if provided
+    let imageId = null;
+    if (imageFiles.length > 0) {
+      const uploadResult = await uploadImage(imageFiles[0]);
+      if (uploadResult.success && uploadResult.image) {
+        imageId = uploadResult.image.id;
+      }
+    }
+
+    // Create product with single image ID
+    const productData = {
+      ...data,
+      image: imageId || 'placeholder'
+    };
+
+    console.log('Creating product with data:', productData);
+    console.log('Image files:', imageFiles);
+    console.log('Image ID:', imageId);
+
+    const response = await API.post('/vendor/products', productData);
+    return response.data;
+  } catch (error) {
+    console.error('Error creating product:', error);
     if (!error.response || error.response.status === 404) {
       return { success: true, message: 'Product created successfully (Mock)', product: { _id: 'PNEW', ...data } };
     }
@@ -171,9 +227,24 @@ export const createProduct = async (data) => {
   }
 };
 
-export const updateProduct = async (id, data) => {
+export const updateProduct = async (id, data, imageFiles = []) => {
   try {
-    const response = await API.put(`/vendor/products/${id}`, data);
+    // Upload new image if provided
+    let imageId = null;
+    if (imageFiles.length > 0) {
+      const uploadResult = await uploadImage(imageFiles[0]);
+      if (uploadResult.success && uploadResult.image) {
+        imageId = uploadResult.image.id;
+      }
+    }
+
+    // Update product with new image ID if any
+    const productData = {
+      ...data,
+      ...(imageId && { image: imageId })
+    };
+
+    const response = await API.patch(`/vendor/products/${id}`, productData);
     return response.data;
   } catch (error) {
     if (!error.response || error.response.status === 404) {

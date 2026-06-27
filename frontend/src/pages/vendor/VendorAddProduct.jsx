@@ -18,9 +18,16 @@ const VendorAddProduct = () => {
     status: 'active'
   });
 
+  const [selectedImage, setSelectedImage] = useState(null);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedImage(file);
   };
 
   const handleSubmit = async (e) => {
@@ -36,7 +43,7 @@ const VendorAddProduct = () => {
         ...formData,
         price: Number(formData.price),
         stock: Number(formData.stock) || 0
-      });
+      }, selectedImage ? [selectedImage] : []);
       toast.success('Product created successfully');
       navigate('/vendor/products');
     } catch (error) {
@@ -163,9 +170,21 @@ const VendorAddProduct = () => {
           <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6">
             <h3 className="font-headline-lg text-lg text-white mb-4">Product Image</h3>
             <div className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:bg-white/5 transition-colors cursor-pointer group">
-              <span className="material-symbols-outlined text-[40px] text-on-primary-container group-hover:text-white transition-colors mb-2">add_photo_alternate</span>
-              <p className="text-sm font-label-md text-on-primary-container group-hover:text-white">Click to upload image</p>
-              <p className="text-xs text-on-primary-container/70 mt-1">SVG, PNG, JPG (max. 2MB)</p>
+              <input 
+                type="file" 
+                accept="image/*"
+                onChange={handleImageChange}
+                className="hidden"
+                id="image-upload"
+              />
+              <label htmlFor="image-upload" className="cursor-pointer">
+                <span className="material-symbols-outlined text-[40px] text-on-primary-container group-hover:text-white transition-colors mb-2">add_photo_alternate</span>
+                <p className="text-sm font-label-md text-on-primary-container group-hover:text-white">Click to upload image</p>
+                <p className="text-xs text-on-primary-container/70 mt-1">SVG, PNG, JPG (max. 2MB)</p>
+                {selectedImage && (
+                  <p className="text-xs text-green-400 mt-2">{selectedImage.name}</p>
+                )}
+              </label>
             </div>
           </div>
         </div>
