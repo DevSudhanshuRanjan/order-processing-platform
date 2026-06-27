@@ -67,7 +67,7 @@ const VendorHome = () => {
           trendUp={true}
         />
         <StatsCard 
-          label="Active Orders" 
+          label="Delivered Orders" 
           value={stats?.stats?.deliveredOrders} 
           icon="shopping_bag" 
           color="#3B82F6"

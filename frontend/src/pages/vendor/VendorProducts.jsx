@@ -58,7 +58,6 @@ const VendorProducts = () => {
           </div>
           <div>
             <span className="font-label-md text-white block">{row.name}</span>
-            <span className="text-xs text-on-primary-container block">{row.category}</span>
           </div>
         </div>
       )
@@ -77,21 +76,21 @@ const VendorProducts = () => {
         </span>
       )
     },
-    { 
-      header: 'Sales', 
-      key: 'salesCount',
-      render: (row) => <span className="text-on-primary-container">{row.salesCount || 0}</span>
-    },
-    { 
-      header: 'Rating', 
-      key: 'rating',
-      render: (row) => (
-        <div className="flex items-center gap-1 text-[#F59E0B]">
-          <span className="material-symbols-outlined text-[14px] icon-fill">star</span>
-          <span className="text-white text-sm">{row.rating || 'N/A'}</span>
-        </div>
-      )
-    },
+    // { 
+    //   header: 'Sales', 
+    //   key: 'salesCount',
+    //   render: (row) => <span className="text-on-primary-container">{row.salesCount || 0}</span>
+    // },
+    // { 
+    //   header: 'Rating', 
+    //   key: 'rating',
+    //   render: (row) => (
+    //     <div className="flex items-center gap-1 text-[#F59E0B]">
+    //       <span className="material-symbols-outlined text-[14px] icon-fill">star</span>
+    //       <span className="text-white text-sm">{row.rating || 'N/A'}</span>
+    //     </div>
+    //   )
+    // },
     { 
       header: 'Status', 
       key: 'status',
