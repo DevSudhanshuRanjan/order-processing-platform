@@ -10,6 +10,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import serviceAreaRoutes from "./routes/serviceAreaRoutes.js";
 import vendorRoutes from "./routes/vendorRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import imageRoutes from "./routes/imageRoutes.js";
 
 import errorMiddleware from "./middlewares/errorMiddleware.js";
 
@@ -31,6 +32,7 @@ app.use("/api/service-areas", serviceAreaRoutes);
 app.use("/api", orderRoutes);
 app.use("/api", adminRoutes);
 app.use("/api", vendorRoutes);
+app.use("/api/images", imageRoutes);
 
 app.use(errorMiddleware);
 
