@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useLocation } from '../contexts/LocationContext';
 
 const LocationPromptModal = ({ onClose }) => {
