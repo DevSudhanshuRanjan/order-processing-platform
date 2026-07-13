@@ -27,19 +27,8 @@ const Navbar = () => {
       {/* Brand Logo */}
       <Link to="/" className="font-headline-lg text-headline-lg-mobile md:text-headline-lg tracking-tighter text-primary dark:text-white">Aura Eats</Link>
       
-      {/* Navigation Links (Web) */}
+      {/* Navigation Links (Web) - Home and Menu removed for SPA */}
       <ul className="hidden md:flex items-center gap-gutter">
-        <li>
-          <Link to="/" className={`${isActive('/') ? 'text-primary dark:text-white font-bold border-b-2 border-primary dark:border-white pb-1 scale-95' : 'text-on-surface-variant dark:text-gray-300 font-medium'} font-label-md text-label-md transition-transform hover:text-primary dark:hover:text-white transition-colors duration-300`}>Home</Link>
-        </li>
-        <li>
-          <Link to="/products" className={`${isActive('/products') ? 'text-primary dark:text-white font-bold border-b-2 border-primary dark:border-white pb-1 scale-95' : 'text-on-surface-variant dark:text-gray-300 font-medium'} font-label-md text-label-md transition-transform hover:text-primary dark:hover:text-white transition-colors duration-300`}>Menu</Link>
-        </li>
-        {role === 'customer' && (
-          <li>
-            <Link to="/orders" className={`${isActive('/orders') ? 'text-primary dark:text-white font-bold border-b-2 border-primary dark:border-white pb-1 scale-95' : 'text-on-surface-variant dark:text-gray-300 font-medium'} font-label-md text-label-md transition-transform hover:text-primary dark:hover:text-white transition-colors duration-300`}>Orders</Link>
-          </li>
-        )}
         {isLoggedIn && role === 'vendor' && (
           <li>
             <Link to="/vendor" className={`${isActive('/vendor') ? 'text-primary dark:text-white font-bold border-b-2 border-primary dark:border-white pb-1 scale-95' : 'text-on-surface-variant dark:text-gray-300 font-medium'} font-label-md text-label-md transition-transform hover:text-primary dark:hover:text-white transition-colors duration-300`}>Dashboard</Link>
@@ -57,14 +46,19 @@ const Navbar = () => {
         <ThemeToggle />
         
         {role === 'customer' && (
-          <Link to="/cart" aria-label="shopping_cart" className="relative p-2 text-on-surface-variant dark:text-gray-300 hover:text-primary dark:hover:text-white transition-colors duration-300">
-            <span className="material-symbols-outlined icon-fill">shopping_cart</span>
-            {totalCartItems > 0 && (
-              <span className="absolute top-0 right-0 bg-[#F97316] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                {totalCartItems}
-              </span>
-            )}
-          </Link>
+          <>
+            <Link to="/orders" aria-label="orders" className="relative p-2 text-on-surface-variant dark:text-gray-300 hover:text-primary dark:hover:text-white transition-colors duration-300" title="Orders">
+              <span className="material-symbols-outlined icon-fill">receipt_long</span>
+            </Link>
+            <Link to="/cart" aria-label="shopping_cart" className="relative p-2 text-on-surface-variant dark:text-gray-300 hover:text-primary dark:hover:text-white transition-colors duration-300">
+              <span className="material-symbols-outlined icon-fill">shopping_cart</span>
+              {totalCartItems > 0 && (
+                <span className="absolute top-0 right-0 bg-[#F97316] text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                  {totalCartItems}
+                </span>
+              )}
+            </Link>
+          </>
         )}
 
         {!isLoggedIn ? (

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import MenuSection from '../components/MenuSection';
 
 const Home = () => {
   return (
@@ -20,7 +21,7 @@ const Home = () => {
               <Link to="/register" className="bg-[#F97316] text-on-primary font-label-md text-label-md px-8 py-4 rounded-xl hover:scale-105 transition-transform duration-300 shadow-lg shadow-[#F97316]/20 inline-block text-center">
                 Order Now
               </Link>
-              <Link to="/products" className="bg-transparent text-primary dark:text-white border border-outline dark:border-gray-700 font-label-md text-label-md px-8 py-4 rounded-xl hover:bg-surface-container dark:hover:bg-gray-800 transition-colors duration-300 inline-block text-center">
+              <Link to="/#menu-section" className="bg-transparent text-primary dark:text-white border border-outline dark:border-gray-700 font-label-md text-label-md px-8 py-4 rounded-xl hover:bg-surface-container dark:hover:bg-gray-800 transition-colors duration-300 inline-block text-center">
                 Explore Menu
               </Link>
             </div>
@@ -73,6 +74,9 @@ const Home = () => {
         </div>
       </section>
 
+      {/* Menu Section - Products embedded directly (SPA) */}
+      <MenuSection />
+
       {/* Categories Section */}
       <section className="py-stack-lg bg-surface dark:bg-[#1a1c1c] px-margin-mobile md:px-margin-desktop">
         <div className="max-w-container-max mx-auto">
@@ -93,7 +97,7 @@ const Home = () => {
           
           {/* Horizontal Scroll Container */}
           <div className="flex overflow-x-auto gap-gutter pb-4 hide-scrollbar snap-x">
-            <Link to="/products?category=Burgers" className="min-w-[160px] md:min-w-[200px] flex flex-col gap-3 group snap-start">
+            <a href="#menu-section" className="min-w-[160px] md:min-w-[200px] flex flex-col gap-3 group snap-start">
               <div className="w-full aspect-[4/5] rounded-[24px] overflow-hidden relative soft-shadow">
                 <div 
                   className="absolute inset-0 bg-cover bg-center w-full h-full transform group-hover:scale-110 transition-transform duration-500" 
@@ -104,9 +108,9 @@ const Home = () => {
               <div className="text-center">
                 <h3 className="font-label-md text-label-md text-primary dark:text-white group-hover:text-[#F97316] transition-colors">Burgers</h3>
               </div>
-            </Link>
+            </a>
             
-            <Link to="/products?category=Pizza" className="min-w-[160px] md:min-w-[200px] flex flex-col gap-3 group snap-start">
+            <a href="#menu-section" className="min-w-[160px] md:min-w-[200px] flex flex-col gap-3 group snap-start">
               <div className="w-full aspect-[4/5] rounded-[24px] overflow-hidden relative soft-shadow">
                 <div 
                   className="absolute inset-0 bg-cover bg-center w-full h-full transform group-hover:scale-110 transition-transform duration-500" 
@@ -116,9 +120,9 @@ const Home = () => {
               <div className="text-center">
                 <h3 className="font-label-md text-label-md text-primary dark:text-white group-hover:text-[#F97316] transition-colors">Pizza</h3>
               </div>
-            </Link>
+            </a>
             
-            <Link to="/products?category=Chinese" className="min-w-[160px] md:min-w-[200px] flex flex-col gap-3 group snap-start">
+            <a href="#menu-section" className="min-w-[160px] md:min-w-[200px] flex flex-col gap-3 group snap-start">
               <div className="w-full aspect-[4/5] rounded-[24px] overflow-hidden relative soft-shadow">
                 <div 
                   className="absolute inset-0 bg-cover bg-center w-full h-full transform group-hover:scale-110 transition-transform duration-500" 
@@ -128,9 +132,9 @@ const Home = () => {
               <div className="text-center">
                 <h3 className="font-label-md text-label-md text-primary dark:text-white group-hover:text-[#F97316] transition-colors">Chinese</h3>
               </div>
-            </Link>
+            </a>
             
-            <Link to="/products?category=Dessert" className="min-w-[160px] md:min-w-[200px] flex flex-col gap-3 group snap-start">
+            <a href="#menu-section" className="min-w-[160px] md:min-w-[200px] flex flex-col gap-3 group snap-start">
               <div className="w-full aspect-[4/5] rounded-[24px] overflow-hidden relative soft-shadow">
                 <div 
                   className="absolute inset-0 bg-cover bg-center w-full h-full transform group-hover:scale-110 transition-transform duration-500" 
@@ -140,9 +144,9 @@ const Home = () => {
               <div className="text-center">
                 <h3 className="font-label-md text-label-md text-primary dark:text-white group-hover:text-[#F97316] transition-colors">Dessert</h3>
               </div>
-            </Link>
+            </a>
             
-            <Link to="/products?category=Drinks" className="min-w-[160px] md:min-w-[200px] flex flex-col gap-3 group snap-start">
+            <a href="#menu-section" className="min-w-[160px] md:min-w-[200px] flex flex-col gap-3 group snap-start">
               <div className="w-full aspect-[4/5] rounded-[24px] overflow-hidden relative soft-shadow">
                 <div 
                   className="absolute inset-0 bg-cover bg-center w-full h-full transform group-hover:scale-110 transition-transform duration-500" 
@@ -152,7 +156,7 @@ const Home = () => {
               <div className="text-center">
                 <h3 className="font-label-md text-label-md text-primary dark:text-white group-hover:text-[#F97316] transition-colors">Drinks</h3>
               </div>
-            </Link>
+            </a>
           </div>
         </div>
       </section>
@@ -186,10 +190,10 @@ const Home = () => {
                 <span className="font-headline-lg text-headline-lg-mobile text-primary dark:text-white">$24</span>
               </div>
               <p className="font-body-md text-body-md text-on-surface-variant dark:text-gray-400 line-clamp-2">Premium wagyu patty, black truffle aioli, aged cheddar, arugula on a brioche bun.</p>
-              <Link to="/products" className="mt-4 w-full bg-primary text-on-primary font-label-md text-label-md py-3 rounded-xl hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+              <a href="#menu-section" className="mt-4 w-full bg-primary text-on-primary font-label-md text-label-md py-3 rounded-xl hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
                 <span>Add to Cart</span>
                 <span className="material-symbols-outlined text-sm">add_shopping_cart</span>
-              </Link>
+              </a>
             </div>
           </div>
           
@@ -214,10 +218,10 @@ const Home = () => {
                 <span className="font-headline-lg text-headline-lg-mobile text-primary dark:text-white">$18</span>
               </div>
               <p className="font-body-md text-body-md text-on-surface-variant dark:text-gray-400 line-clamp-2">San Marzano tomatoes, fresh mozzarella di bufala, basil, extra virgin olive oil.</p>
-              <Link to="/products" className="mt-4 w-full bg-primary text-on-primary font-label-md text-label-md py-3 rounded-xl hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+              <a href="#menu-section" className="mt-4 w-full bg-primary text-on-primary font-label-md text-label-md py-3 rounded-xl hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
                 <span>Add to Cart</span>
                 <span className="material-symbols-outlined text-sm">add_shopping_cart</span>
-              </Link>
+              </a>
             </div>
           </div>
           
@@ -242,10 +246,10 @@ const Home = () => {
                 <span className="font-headline-lg text-headline-lg-mobile text-primary dark:text-white">$21</span>
               </div>
               <p className="font-body-md text-body-md text-on-surface-variant dark:text-gray-400 line-clamp-2">Fresh Atlantic salmon, sushi rice, avocado, edamame, ponzu dressing, sesame.</p>
-              <Link to="/products" className="mt-4 w-full bg-primary text-on-primary font-label-md text-label-md py-3 rounded-xl hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
+              <a href="#menu-section" className="mt-4 w-full bg-primary text-on-primary font-label-md text-label-md py-3 rounded-xl hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
                 <span>Add to Cart</span>
                 <span className="material-symbols-outlined text-sm">add_shopping_cart</span>
-              </Link>
+              </a>
             </div>
           </div>
         </div>
