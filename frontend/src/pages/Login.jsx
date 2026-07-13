@@ -59,7 +59,7 @@ const Login = () => {
         toast.success('Welcome back!');
         if (data.user.role === 'admin') navigate('/admin');
         else if (data.user.role === 'vendor') navigate('/vendor');
-        else navigate('/products');
+        else navigate('/');
       } else {
         toast.error(data.message || 'Login failed');
       }
