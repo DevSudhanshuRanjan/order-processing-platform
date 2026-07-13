@@ -54,6 +54,7 @@ export const LocationProvider = ({ children }) => {
   const [longitude, setLongitude] = useState(null);
   const [serviceable, setServiceable] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [permissionState, setPermissionState] = useState('prompt'); // 'prompt' | 'granted' | 'denied'
 
   const checkServiceability = useCallback((lat, lng) => {
     const pt = turf.point([lng, lat]);
@@ -67,6 +68,7 @@ export const LocationProvider = ({ children }) => {
   const getCurrentLocation = useCallback(() => {
     if (!('geolocation' in navigator)) {
       setLoading(false);
+      setPermissionState('denied');
       return;
     }
     setLoading(true);
@@ -77,6 +79,7 @@ export const LocationProvider = ({ children }) => {
         setLatitude(lat);
         setLongitude(lng);
         checkServiceability(lat, lng);
+        setPermissionState('granted');
         setLoading(false);
       },
       (error) => {
@@ -85,11 +88,36 @@ export const LocationProvider = ({ children }) => {
         if (error.code === error.PERMISSION_DENIED) {
           localStorage.setItem('aura_location_denied', 'true');
           setServiceable(false);
+          setPermissionState('denied');
         }
       },
       { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
     );
   }, [checkServiceability]);
+
+  // Check current permission state on mount
+  useEffect(() => {
+    if ('permissions' in navigator && 'query' in navigator.permissions) {
+      navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+        setPermissionState(result.state);
+        
+        // Listen for permission changes
+        result.addEventListener('change', () => {
+          setPermissionState(result.state);
+          if (result.state === 'granted') {
+            // Permission was granted, try to get location
+            getCurrentLocation();
+          } else if (result.state === 'denied') {
+            localStorage.setItem('aura_location_denied', 'true');
+            setServiceable(false);
+          }
+        });
+      }).catch(() => {
+        // Fallback if permissions API not supported
+        setPermissionState('prompt');
+      });
+    }
+  }, [getCurrentLocation]);
 
   // On mount, restore from cache if available (no permission prompt)
   useEffect(() => {
@@ -129,6 +157,7 @@ export const LocationProvider = ({ children }) => {
       longitude, 
       serviceable, 
       loading, 
+      permissionState,
       getCurrentLocation, 
       updateLocationFromPincode,
       checkServiceability,

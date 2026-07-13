@@ -27,11 +27,25 @@ const HeroDashboard = () => {
   const locationDenied = localStorage.getItem('aura_location_denied') === 'true';
   const hasLocation = hasCachedLocation || serviceable;
 
+  // Track if we've already attempted verification in this session
+  const [verificationAttempted, setVerificationAttempted] = useState(false);
+
+  // On customer login, always verify location permission by attempting to get location
+  // This catches cases where user previously allowed but later revoked browser permission
   useEffect(() => {
-    if (isCustomer && !hasLocation && !locationDenied && !locationLoading) {
+    if (isCustomer && !verificationAttempted && !locationLoading) {
+      setVerificationAttempted(true);
+      // Attempt to get location - will succeed if permission granted, fail if denied
+      getCurrentLocation();
+    }
+  }, [isCustomer, verificationAttempted, locationLoading, getCurrentLocation]);
+
+  // Show modal if customer doesn't have location and hasn't explicitly denied
+  useEffect(() => {
+    if (isCustomer && !serviceable && !locationDenied && !locationLoading) {
       setShowLocationModal(true);
     }
-  }, [isCustomer, hasLocation, locationDenied, locationLoading]);
+  }, [isCustomer, serviceable, locationDenied, locationLoading]);
 
   useEffect(() => {
     const fetchData = async () => {

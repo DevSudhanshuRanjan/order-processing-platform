@@ -1,9 +1,11 @@
 import { useLocation } from '../contexts/LocationContext';
 
 const LocationPromptModal = ({ onClose }) => {
-  const { getCurrentLocation, loading } = useLocation();
+  const { getCurrentLocation, loading, permissionState } = useLocation();
+  const [permissionBlocked, setPermissionBlocked] = useState(false);
 
-  const handleAllow = () => {
+  const handleAllow = async () => {
+    setPermissionBlocked(false);
     getCurrentLocation();
     onClose();
   };
@@ -13,6 +15,16 @@ const LocationPromptModal = ({ onClose }) => {
     localStorage.setItem('aura_location_denied', 'true');
     onClose();
   };
+
+  // Check if geolocation is supported
+  const isGeolocationSupported = 'geolocation' in navigator;
+  
+  // Determine if permission is blocked based on actual browser state
+  useEffect(() => {
+    if (permissionState === 'denied') {
+      setPermissionBlocked(true);
+    }
+  }, [permissionState]);
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
@@ -34,47 +46,80 @@ const LocationPromptModal = ({ onClose }) => {
             Allow location access to check if we can deliver to your area and show you the most relevant menu items.
           </p>
 
+          {/* Permission Blocked Warning */}
+          {permissionBlocked && (
+            <div className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-left">
+              <div className="flex items-start gap-3">
+                <span className="material-symbols-outlined text-red-600 dark:text-red-400 text-2xl flex-shrink-0">warning</span>
+                <div>
+                  <p className="font-label-md text-label-md text-red-700 dark:text-red-400 font-semibold mb-1">Permission Blocked</p>
+                  <p className="font-body-sm text-body-sm text-red-600 dark:text-red-300 mb-2">
+                    Location access was previously denied. To enable it:
+                  </p>
+                  <ol className="font-label-sm text-label-sm text-red-700 dark:text-red-300 space-y-1 list-decimal list-inside">
+                    <li>Click the lock icon in your browser's address bar</li>
+                    <li>Find "Location" and change it to "Allow"</li>
+                    <li>Refresh the page</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Feature Highlights */}
-          <div className="flex flex-col gap-3 mb-6 text-left">
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-surface-container dark:bg-gray-800/50">
-              <div className="w-9 h-9 rounded-lg bg-[#F97316]/10 flex items-center justify-center flex-shrink-0">
-                <span className="material-symbols-outlined text-[#F97316] text-lg">check_circle</span>
+          {!permissionBlocked && (
+            <div className="flex flex-col gap-3 mb-6 text-left">
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-surface-container dark:bg-gray-800/50">
+                <div className="w-9 h-9 rounded-lg bg-[#F97316]/10 flex items-center justify-center flex-shrink-0">
+                  <span className="material-symbols-outlined text-[#F97316] text-lg">check_circle</span>
+                </div>
+                <div>
+                  <p className="font-label-md text-label-md text-primary dark:text-white">Delivery Check</p>
+                  <p className="font-label-sm text-label-sm text-on-surface-variant dark:text-gray-400">See if we deliver to your address</p>
+                </div>
               </div>
-              <div>
-                <p className="font-label-md text-label-md text-primary dark:text-white">Delivery Check</p>
-                <p className="font-label-sm text-label-sm text-on-surface-variant dark:text-gray-400">See if we deliver to your address</p>
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-surface-container dark:bg-gray-800/50">
+                <div className="w-9 h-9 rounded-lg bg-[#F97316]/10 flex items-center justify-center flex-shrink-0">
+                  <span className="material-symbols-outlined text-[#F97316] text-lg">schedule</span>
+                </div>
+                <div>
+                  <p className="font-label-md text-label-md text-primary dark:text-white">Accurate ETA</p>
+                  <p className="font-label-sm text-label-sm text-on-surface-variant dark:text-gray-400">Get precise delivery time estimates</p>
+                </div>
               </div>
             </div>
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-surface-container dark:bg-gray-800/50">
-              <div className="w-9 h-9 rounded-lg bg-[#F97316]/10 flex items-center justify-center flex-shrink-0">
-                <span className="material-symbols-outlined text-[#F97316] text-lg">schedule</span>
-              </div>
-              <div>
-                <p className="font-label-md text-label-md text-primary dark:text-white">Accurate ETA</p>
-                <p className="font-label-sm text-label-sm text-on-surface-variant dark:text-gray-400">Get precise delivery time estimates</p>
-              </div>
-            </div>
-          </div>
+          )}
 
           {/* Action Buttons */}
           <div className="flex flex-col gap-3">
-            <button
-              onClick={handleAllow}
-              disabled={loading}
-              className="w-full py-3.5 rounded-xl bg-[#F97316] text-white font-label-md text-label-md hover:scale-[1.02] transition-all duration-300 shadow-lg shadow-[#F97316]/20 flex items-center justify-center gap-2 disabled:opacity-70"
-            >
-              {loading ? (
-                <>
-                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Locating...
-                </>
-              ) : (
-                <>
-                  <span className="material-symbols-outlined text-lg">my_location</span>
-                  Allow Location Access
-                </>
-              )}
-            </button>
+            {!permissionBlocked && (
+              <button
+                onClick={handleAllow}
+                disabled={loading}
+                className="w-full py-3.5 rounded-xl bg-[#F97316] text-white font-label-md text-label-md hover:scale-[1.02] transition-all duration-300 shadow-lg shadow-[#F97316]/20 flex items-center justify-center gap-2 disabled:opacity-70"
+              >
+                {loading ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Locating...
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined text-lg">my_location</span>
+                    Allow Location Access
+                  </>
+                )}
+              </button>
+            )}
+            {permissionBlocked && (
+              <button
+                onClick={() => window.location.reload()}
+                className="w-full py-3.5 rounded-xl bg-[#F97316] text-white font-label-md text-label-md hover:scale-[1.02] transition-all duration-300 shadow-lg shadow-[#F97316]/20 flex items-center justify-center gap-2"
+              >
+                <span className="material-symbols-outlined text-lg">refresh</span>
+                Refresh Page
+              </button>
+            )}
             <button
               onClick={handleDeny}
               className="w-full py-3 rounded-xl bg-surface-container dark:bg-gray-800 text-on-surface-variant dark:text-gray-300 font-label-md text-label-md hover:bg-surface-container-high dark:hover:bg-gray-700 transition-colors"
