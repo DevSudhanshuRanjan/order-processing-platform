@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import * as turf from '@turf/turf';
 
 const LocationContext = createContext();
@@ -12,41 +12,94 @@ export const DELI_ZONE_POLYGON = [
   [76.84, 28.88]  // Close the polygon
 ];
 
+// Cache key for localStorage
+const LOCATION_CACHE_KEY = 'aura_location_cache';
+
+// Maximum age for cached location in milliseconds (24 hours)
+const CACHE_MAX_AGE = 24 * 60 * 60 * 1000;
+
+const getCachedLocation = () => {
+  try {
+    const cached = localStorage.getItem(LOCATION_CACHE_KEY);
+    if (cached) {
+      const data = JSON.parse(cached);
+      // Check if cache is still valid
+      if (data.timestamp && (Date.now() - data.timestamp < CACHE_MAX_AGE)) {
+        return data;
+      }
+    }
+  } catch (e) {
+    // Ignore parse errors
+  }
+  return null;
+};
+
+const setCachedLocation = (lat, lng, serviceable) => {
+  try {
+    localStorage.setItem(LOCATION_CACHE_KEY, JSON.stringify({
+      latitude: lat,
+      longitude: lng,
+      serviceable,
+      timestamp: Date.now()
+    }));
+    // Clear denied flag on successful location
+    localStorage.removeItem('aura_location_denied');
+  } catch (e) {
+    // Ignore storage errors
+  }
+};
+
 export const LocationProvider = ({ children }) => {
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
   const [serviceable, setServiceable] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const checkServiceability = (lat, lng) => {
+  const checkServiceability = useCallback((lat, lng) => {
     const pt = turf.point([lng, lat]);
     const poly = turf.polygon([DELI_ZONE_POLYGON]);
     const isInside = turf.booleanPointInPolygon(pt, poly);
     setServiceable(isInside);
+    setCachedLocation(lat, lng, isInside);
     return isInside;
-  };
+  }, []);
 
-  const getCurrentLocation = () => {
-    setLoading(true);
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          setLatitude(lat);
-          setLongitude(lng);
-          checkServiceability(lat, lng);
-          setLoading(false);
-        },
-        (error) => {
-          console.error("Error getting location", error);
-          setLoading(false);
-        }
-      );
-    } else {
+  const getCurrentLocation = useCallback(() => {
+    if (!('geolocation' in navigator)) {
       setLoading(false);
+      return;
     }
-  };
+    setLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        setLatitude(lat);
+        setLongitude(lng);
+        checkServiceability(lat, lng);
+        setLoading(false);
+      },
+      (error) => {
+        console.error("Error getting location", error);
+        setLoading(false);
+        if (error.code === error.PERMISSION_DENIED) {
+          localStorage.setItem('aura_location_denied', 'true');
+          setServiceable(false);
+        }
+      },
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
+    );
+  }, [checkServiceability]);
+
+  // On mount, restore from cache if available (no permission prompt)
+  useEffect(() => {
+    const cached = getCachedLocation();
+    if (cached) {
+      setLatitude(cached.latitude);
+      setLongitude(cached.longitude);
+      setServiceable(cached.serviceable);
+    }
+  }, []);
 
   const updateLocationFromPincode = async (pincode) => {
     setLoading(true);

@@ -6,18 +6,32 @@ import { useLocation } from '../contexts/LocationContext';
 import { getProducts } from '../services/productService';
 import { getUserOrders } from '../services/orderService';
 import { getImageUrl, getVendorStats } from '../services/vendorService';
+import LocationPromptModal from './LocationPromptModal';
 
 const HeroDashboard = () => {
   const { isLoggedIn, role } = useAuth();
   const { cartItems, subtotal, totalCartItems } = useCart();
-  const { serviceable, getCurrentLocation } = useLocation();
+  const { serviceable, loading: locationLoading, getCurrentLocation } = useLocation();
   
   const [featuredProduct, setFeaturedProduct] = useState(null);
   const [recentOrders, setRecentOrders] = useState([]);
   const [vendorStats, setVendorStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showLocationModal, setShowLocationModal] = useState(false);
 
   const totalQty = cartItems?.reduce((acc, item) => acc + item.quantity, 0) || 0;
+
+  // Show location prompt modal for logged-in customers who haven't been asked yet
+  const isCustomer = isLoggedIn && role === 'customer';
+  const hasCachedLocation = !!localStorage.getItem('aura_location_cache');
+  const locationDenied = localStorage.getItem('aura_location_denied') === 'true';
+  const hasLocation = hasCachedLocation || serviceable;
+
+  useEffect(() => {
+    if (isCustomer && !hasLocation && !locationDenied && !locationLoading) {
+      setShowLocationModal(true);
+    }
+  }, [isCustomer, hasLocation, locationDenied, locationLoading]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -87,16 +101,35 @@ const HeroDashboard = () => {
               <span className="material-symbols-outlined text-primary dark:text-gray-400 text-lg">schedule</span>
               <span className="font-label-sm text-label-sm text-on-surface-variant dark:text-gray-400">Under 30 mins</span>
             </div>
-            <button 
-              onClick={getCurrentLocation}
-              className="flex items-center gap-1.5 hover:text-primary dark:hover:text-white transition-colors"
-              title="Check delivery availability"
-            >
-              <span className="material-symbols-outlined text-lg">my_location</span>
-              <span className={`font-label-sm text-label-sm ${serviceable ? 'text-green-600 dark:text-green-400' : 'text-on-surface-variant dark:text-gray-400'}`}>
-                {serviceable ? 'Deliverable' : 'Check Area'}
-              </span>
-            </button>
+            {serviceable ? (
+              <div className="flex items-center gap-1.5" title="Delivery available">
+                <span className="material-symbols-outlined text-lg text-green-600 dark:text-green-400">check_circle</span>
+                <span className="font-label-sm text-label-sm text-green-600 dark:text-green-400">Deliverable</span>
+              </div>
+            ) : isCustomer ? (
+              <div className="flex items-center gap-1.5">
+                {locationLoading ? (
+                  <>
+                    <span className="material-symbols-outlined text-lg animate-pulse text-gray-400">my_location</span>
+                    <span className="font-label-sm text-label-sm text-gray-400">Checking...</span>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => setShowLocationModal(true)}
+                    className="flex items-center gap-1.5 hover:text-primary dark:hover:text-white transition-colors group"
+                    title="Check delivery availability"
+                  >
+                    <span className="material-symbols-outlined text-lg text-on-surface-variant dark:text-gray-400 group-hover:text-primary dark:group-hover:text-white">my_location</span>
+                    <span className="font-label-sm text-label-sm text-on-surface-variant dark:text-gray-400 group-hover:text-primary dark:group-hover:text-white">Check if deliverable</span>
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5" title="Sign in to check delivery">
+                <span className="material-symbols-outlined text-lg text-on-surface-variant dark:text-gray-400">location_off</span>
+                <span className="font-label-sm text-label-sm text-on-surface-variant dark:text-gray-400">Not available</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -246,6 +279,11 @@ const HeroDashboard = () => {
 
         </div>
       </div>
+
+      {/* Location Prompt Modal */}
+      {showLocationModal && (
+        <LocationPromptModal onClose={() => setShowLocationModal(false)} />
+      )}
     </section>
   );
 };
