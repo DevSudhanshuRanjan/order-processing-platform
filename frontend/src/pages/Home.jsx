@@ -1,78 +1,12 @@
 import { Link } from 'react-router-dom';
 import MenuSection from '../components/MenuSection';
+import HeroDashboard from '../components/HeroDashboard';
 
 const Home = () => {
   return (
     <div className="flex flex-col min-h-screen bg-background dark:bg-[#1a1c1c]">
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto overflow-hidden">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-gutter items-center">
-          {/* Hero Text Content */}
-          <div className="z-10 flex flex-col gap-stack-md">
-            <h1 className="font-display-lg text-display-lg-mobile md:text-display-lg text-primary dark:text-white animate-reveal">
-              Fast Delivery,<br/>
-              Fresh Food,<br/>
-              <span className="text-secondary dark:text-gray-300">Delivered To Your Door.</span>
-            </h1>
-            <p className="font-body-lg text-body-lg text-on-surface-variant dark:text-gray-400 max-w-md animate-reveal delay-100">
-              Experience quiet luxury in every bite. Curated ingredients, seamless ordering, and food that arrives perfectly prepared.
-            </p>
-            <div className="flex flex-wrap items-center gap-stack-sm animate-reveal delay-200">
-              <Link to="/register" className="bg-[#F97316] text-on-primary font-label-md text-label-md px-8 py-4 rounded-xl hover:scale-105 transition-transform duration-300 shadow-lg shadow-[#F97316]/20 inline-block text-center">
-                Order Now
-              </Link>
-              <Link to="/#menu-section" className="bg-transparent text-primary dark:text-white border border-outline dark:border-gray-700 font-label-md text-label-md px-8 py-4 rounded-xl hover:bg-surface-container dark:hover:bg-gray-800 transition-colors duration-300 inline-block text-center">
-                Explore Menu
-              </Link>
-            </div>
-            
-            {/* Quick Stats */}
-            <div className="flex items-center gap-gutter pt-stack-sm animate-reveal delay-300">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#F97316] icon-fill">star</span>
-                <span className="font-label-md text-label-md">4.9 (2k+ Reviews)</span>
-              </div>
-              <div className="flex items-center gap-2 dark:text-gray-300">
-                <span className="material-symbols-outlined text-primary dark:text-gray-400">schedule</span>
-                <span className="font-label-md text-label-md">Under 30 mins</span>
-              </div>
-            </div>
-          </div>
-          
-          {/* Hero Image/Composition */}
-          <div className="relative h-[400px] md:h-[600px] w-full flex items-center justify-center animate-reveal delay-200">
-            {/* Abstract background shape */}
-            <div className="absolute inset-0 bg-secondary-container dark:bg-gray-800/30 rounded-full blur-3xl opacity-50 transform -translate-y-10 scale-110"></div>
-            {/* Main Food Image */}
-            <div className="relative w-full h-full rounded-[40px] overflow-hidden soft-shadow group">
-              <div 
-                className="absolute inset-0 bg-cover bg-center w-full h-full transform group-hover:scale-105 transition-transform duration-700 ease-out" 
-                style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBD8n1qtgZRtFSJixvkfKEGsUjDBFmnLSGsSTV3uESsB6VwHxcSfaFpVlQ405CROifq9Ip5IX3XQmQ8tbGVZYYQCvAbnUvlmsiTrRYpPOWURCnMzNfJGJLWxHAWlykyDJN_TVTvRhy-4rDo6Xmb4l4_Wvc-Sa32u8wpusAJ-y5vSd0LAzYae1nJ7W0slrALdBwfvH_4rf5gZFRUL-ITuVvzLOFkAHJjzKJOwTkMCTbRruHM2gUSK3kLuDED8mY_UK38cvWV0xaYWAk')" }}
-              ></div>
-            </div>
-            {/* Floating Elements */}
-            <div className="absolute bottom-10 left-[-20px] glass-panel p-4 rounded-xl soft-shadow dark:bg-[#121414]/80 dark:border dark:border-gray-800 flex items-center gap-3 transform hover:-translate-y-2 transition-transform duration-300">
-              <div className="w-12 h-12 rounded-full bg-[#F97316]/10 flex items-center justify-center">
-                <span className="material-symbols-outlined text-[#F97316]">local_pizza</span>
-              </div>
-              <div>
-                <p className="font-label-sm text-label-sm text-on-surface-variant dark:text-gray-400">Hot & Fresh</p>
-                <p className="font-label-md text-label-md text-primary dark:text-white">Artisan Pizza</p>
-              </div>
-            </div>
-            <div className="absolute top-20 right-[-10px] glass-panel p-4 rounded-xl soft-shadow dark:bg-[#121414]/80 dark:border dark:border-gray-800 flex flex-col gap-1 transform hover:translate-y-2 transition-transform duration-300">
-              <div className="flex items-center gap-1 text-[#F97316]">
-                <span className="material-symbols-outlined text-sm icon-fill">star</span>
-                <span className="material-symbols-outlined text-sm icon-fill">star</span>
-                <span className="material-symbols-outlined text-sm icon-fill">star</span>
-                <span className="material-symbols-outlined text-sm icon-fill">star</span>
-                <span className="material-symbols-outlined text-sm icon-fill">star</span>
-              </div>
-              <p className="font-label-md text-label-md text-primary dark:text-white">"Best delivery in town"</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Hero Section - Widget Dashboard */}
+      <HeroDashboard />
 
       {/* Menu Section - Products embedded directly (SPA) */}
       <MenuSection />
