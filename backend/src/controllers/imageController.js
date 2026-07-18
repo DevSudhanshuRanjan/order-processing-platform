@@ -25,7 +25,8 @@ export const createImage = async (req, res, next) => {
 
     const processedBuffer = await sharp(req.file.buffer)
       .resize(1280, 720, {
-        fit: "fill",
+        fit: "cover",
+        position: "center",
         withoutEnlargement: false,
       })
       .avif({ quality: 80 })
@@ -98,7 +99,8 @@ export const updateImage = async (req, res, next) => {
 
     const processedBuffer = await sharp(req.file.buffer)
       .resize(1280, 720, {
-        fit: "fill",
+        fit: "cover",
+        position: "center",
         withoutEnlargement: false,
       })
       .avif({ quality: 80 })
