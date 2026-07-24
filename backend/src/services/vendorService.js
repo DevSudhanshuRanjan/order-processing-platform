@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 import Product from "../models/Product.js";
 import Order from "../models/Order.js";
+import User from "../models/User.js";
 
 export const getDashboard = async (
   vendorId
@@ -137,4 +138,46 @@ export const getAnalytics = async (
 
     pending,
   };
+};
+
+export const getAllVendorsWithTopProduct = async () => {
+  const vendors = await User.find({
+    role: "vendor",
+    status: "active",
+  }).select("_id name email");
+
+  const vendorsWithProduct = await Promise.all(
+    vendors.map(async (vendor) => {
+      const topProduct = await Product.findOne({
+        vendorId: vendor._id,
+        status: "active",
+      })
+        .sort({ averageRating: -1, numberOfRatings: -1 })
+        .select("name price image averageRating numberOfRatings")
+        .lean();
+
+      const totalProducts = await Product.countDocuments({
+        vendorId: vendor._id,
+        status: "active",
+      });
+
+      return {
+        _id: vendor._id,
+        name: vendor.name,
+        totalProducts,
+        topProduct: topProduct
+          ? {
+              _id: topProduct._id,
+              name: topProduct.name,
+              price: topProduct.price,
+              image: topProduct.image,
+              averageRating: topProduct.averageRating,
+              numberOfRatings: topProduct.numberOfRatings,
+            }
+          : null,
+      };
+    })
+  );
+
+  return vendorsWithProduct.filter((v) => v.topProduct);
 };

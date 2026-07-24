@@ -8,6 +8,7 @@ export const CartProvider = ({ children }) => {
   const { role } = useAuth();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [vendorConflict, setVendorConflict] = useState(null);
 
   const fetchCart = async () => {
     try {
@@ -50,8 +51,37 @@ export const CartProvider = ({ children }) => {
         await fetchCart();
       }
     } catch (error) {
+      if (error.response && error.response.status === 409 && error.response.data.vendorConflict) {
+        // Show vendor switch popup
+        setVendorConflict({
+          ...error.response.data,
+          product,
+        });
+        return;
+      }
       console.error("Error adding to cart:", error);
     }
+  };
+
+  const handleSwitchVendor = async () => {
+    if (!vendorConflict) return;
+    try {
+      const res = await API.post("/cart/switch-vendor", {
+        productId: vendorConflict.productId,
+        quantity: vendorConflict.quantity,
+      });
+
+      if (res.data.success) {
+        setVendorConflict(null);
+        await fetchCart();
+      }
+    } catch (error) {
+      console.error("Error switching vendor:", error);
+    }
+  };
+
+  const handleCancelSwitchVendor = () => {
+    setVendorConflict(null);
   };
 
   const removeFromCart = async (productId) => {
@@ -150,6 +180,9 @@ export const CartProvider = ({ children }) => {
         deliveryFee,
         tax,
         grandTotal,
+        vendorConflict,
+        handleSwitchVendor,
+        handleCancelSwitchVendor,
       }}
     >
       {children}

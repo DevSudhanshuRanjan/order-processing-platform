@@ -27,6 +27,12 @@ const cartSchema = new mongoose.Schema(
     },
 
     items: [cartItemSchema],
+
+    vendorAssigned: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
   },
   {
     timestamps: true,

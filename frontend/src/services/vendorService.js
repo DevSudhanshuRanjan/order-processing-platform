@@ -277,3 +277,14 @@ export const updateInventory = async (id, stock) => {
     throw error;
   }
 };
+
+// Public - get all vendors with their top-rated product
+export const getVendors = async () => {
+  try {
+    const response = await API.get('/vendors');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching vendors:', error);
+    return { success: false, vendors: [] };
+  }
+};

@@ -40,3 +40,18 @@ export const getAnalytics =
       next(error);
     }
   };
+
+export const getVendorsWithTopProduct =
+  async (req, res, next) => {
+    try {
+      const vendors =
+        await vendorService.getAllVendorsWithTopProduct();
+
+      return res.status(200).json({
+        success: true,
+        vendors,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };

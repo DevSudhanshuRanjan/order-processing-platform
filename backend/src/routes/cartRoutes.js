@@ -4,6 +4,7 @@ import {
   getCart,
   updateCart,
   removeCartItem,
+  switchVendorAndAdd,
 } from "../controllers/cartController.js";
 
 import authMiddleware from "../middlewares/authMiddleware.js";
@@ -24,6 +25,14 @@ router.post(
   roleMiddleware("customer"),
   addToCartValidator,
   addToCart
+);
+
+router.post(
+  "/switch-vendor",
+  authMiddleware,
+  roleMiddleware("customer"),
+  addToCartValidator,
+  switchVendorAndAdd
 );
 
 router.get(

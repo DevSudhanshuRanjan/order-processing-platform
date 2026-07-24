@@ -6,9 +6,16 @@ import roleMiddleware from "../middlewares/roleMiddleware.js";
 import {
   getDashboard,
   getAnalytics,
+  getVendorsWithTopProduct,
 } from "../controllers/vendorController.js";
 
 const router = express.Router();
+
+// Public - get all vendors with their top-rated product
+router.get(
+  "/vendors",
+  getVendorsWithTopProduct
+);
 
 router.get(
   "/vendor/dashboard",

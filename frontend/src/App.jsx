@@ -8,6 +8,7 @@ import { RoleRoute } from './routes/RoleRoute';
 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import VendorSwitchModal from './components/VendorSwitchModal';
 
 // Public Pages
 import Home from './pages/Home';
@@ -34,6 +35,7 @@ function AppContent() {
   return (
     <>
       {!isDashboard && <Navbar />}
+      <VendorSwitchModal />
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />

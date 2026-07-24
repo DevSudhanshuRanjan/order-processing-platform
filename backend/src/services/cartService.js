@@ -21,6 +21,7 @@ export const addItem = async (userId, productId, quantity = 1) => {
   if (!cart) {
     cart = await Cart.create({
       userId,
+      vendorAssigned: product.vendorId,
       items: [
         {
           productId,
@@ -29,7 +30,7 @@ export const addItem = async (userId, productId, quantity = 1) => {
       ],
     });
 
-    return cart;
+    return { cart, vendorConflict: false };
   }
 
   if (cart && cart.items.length > 0) {
@@ -39,7 +40,15 @@ export const addItem = async (userId, productId, quantity = 1) => {
       firstItem &&
       firstItem.vendorId.toString() !== product.vendorId.toString()
     ) {
-      throw new AppError("You Can Only Order From One Vendor At A Time", 400);
+      // Return vendor conflict info instead of throwing error
+      return {
+        cart,
+        vendorConflict: true,
+        currentVendorId: firstItem.vendorId.toString(),
+        newVendorId: product.vendorId.toString(),
+        productId,
+        quantity,
+      };
     }
   }
 
@@ -59,7 +68,50 @@ export const addItem = async (userId, productId, quantity = 1) => {
     });
   }
 
+  cart.vendorAssigned = product.vendorId;
   await cart.save();
+
+  return { cart, vendorConflict: false };
+};
+
+export const switchVendor = async (userId, productId, quantity = 1) => {
+  const product = await Product.findById(productId);
+
+  if (!product) {
+    throw new AppError("Product Not Found", 404);
+  }
+
+  if (product.status !== "active" || product.stock <= 0) {
+    throw new AppError("Product Not Available", 404);
+  }
+  if (quantity > product.stock) {
+    throw new AppError("Quantity Exceeds Available Stock", 400);
+  }
+
+  // Clear existing cart and add the new item
+  let cart = await Cart.findOne({ userId });
+
+  if (!cart) {
+    cart = await Cart.create({
+      userId,
+      vendorAssigned: product.vendorId,
+      items: [
+        {
+          productId,
+          quantity,
+        },
+      ],
+    });
+  } else {
+    cart.items = [
+      {
+        productId,
+        quantity,
+      },
+    ];
+    cart.vendorAssigned = product.vendorId;
+    await cart.save();
+  }
 
   return cart;
 };
@@ -67,7 +119,7 @@ export const addItem = async (userId, productId, quantity = 1) => {
 export const getUserCart = async (userId) => {
   const cart = await Cart.findOne({ userId }).populate({
     path: "items.productId",
-    select: "name price image stock",
+    select: "name price image stock vendorId",
   });
 
   return cart;
@@ -116,6 +168,10 @@ export const removeItem = async (userId, productId) => {
     (item) => item.productId.toString() !== productId,
   );
 
+  if (cart.items.length === 0) {
+    cart.vendorAssigned = null;
+  }
+
   await cart.save();
 
   return cart;
@@ -129,6 +185,7 @@ export const clearCart = async (userId) => {
   }
 
   cart.items = [];
+  cart.vendorAssigned = null;
 
   await cart.save();
 };

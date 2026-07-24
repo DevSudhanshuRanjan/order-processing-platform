@@ -1,8 +1,29 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import MenuSection from '../components/MenuSection';
 import HeroDashboard from '../components/HeroDashboard';
+import { getVendors, getImageUrl } from '../services/vendorService';
 
 const Home = () => {
+  const [vendors, setVendors] = useState([]);
+  const [vendorsLoading, setVendorsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchVendors = async () => {
+      try {
+        const data = await getVendors();
+        if (data.success) {
+          setVendors(data.vendors);
+        }
+      } catch (error) {
+        console.error('Error fetching vendors:', error);
+      } finally {
+        setVendorsLoading(false);
+      }
+    };
+    fetchVendors();
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen bg-background dark:bg-[#1a1c1c]">
       {/* Hero Section - Widget Dashboard */}
@@ -11,87 +32,70 @@ const Home = () => {
       {/* Menu Section - Products embedded directly (SPA) */}
       <MenuSection />
 
-      {/* Categories Section */}
+      {/* Restaurants Section */}
       <section className="py-stack-lg bg-surface dark:bg-[#1a1c1c] px-margin-mobile md:px-margin-desktop">
         <div className="max-w-container-max mx-auto">
           <div className="flex justify-between items-end mb-stack-md">
             <div>
-              <h2 className="font-headline-xl text-headline-xl text-primary dark:text-white">Explore Categories</h2>
-              <p className="font-body-md text-body-md text-on-surface-variant dark:text-gray-400 mt-2">Find your cravings, elevated.</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <button className="w-10 h-10 rounded-full border border-outline-variant dark:border-gray-700 flex items-center justify-center hover:bg-surface-container dark:hover:bg-gray-800 dark:text-gray-300 transition-colors">
-                <span className="material-symbols-outlined">arrow_back</span>
-              </button>
-              <button className="w-10 h-10 rounded-full border border-outline-variant dark:border-gray-700 flex items-center justify-center hover:bg-surface-container dark:hover:bg-gray-800 dark:text-gray-300 transition-colors">
-                <span className="material-symbols-outlined">arrow_forward</span>
-              </button>
+              <h2 className="font-headline-xl text-headline-xl text-primary dark:text-white">Our Restaurants</h2>
+              <p className="font-body-md text-body-md text-on-surface-variant dark:text-gray-400 mt-2">Discover top-rated places, curated for you.</p>
             </div>
           </div>
           
-          {/* Horizontal Scroll Container */}
-          <div className="flex overflow-x-auto gap-gutter pb-4 hide-scrollbar snap-x">
-            <a href="#menu-section" className="min-w-[160px] md:min-w-[200px] flex flex-col gap-3 group snap-start">
-              <div className="w-full aspect-[4/5] rounded-[24px] overflow-hidden relative soft-shadow">
-                <div 
-                  className="absolute inset-0 bg-cover bg-center w-full h-full transform group-hover:scale-110 transition-transform duration-500" 
-                  style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDJ9RviPD5riivksE2-QWg73pDt-XddMIkRM_GcOueaeN1WT_WESEXJXkFnB1qZB6iIrJuA1vqqLsBuNsa_UwSTvEhaSmef-CiBLfP6_wz2WPPZ73RNe-fNjc8YDBFQC1qhW3xhJmg1PInLmye-P5vLmFtXIIT5fZk2n0th6vrie6Z5dlabzW2zeuuaCip8H9LWhxVTdSaVmNfV6wM5cvphQ680Aq6Jjg_8zBfj1Tj7L0SPkpGgKontNTD-UPUfj9RYCtyMWiXDN7g')" }}
-                ></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          {/* Vendors Grid */}
+          {vendorsLoading ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-gutter">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="flex flex-col gap-3 animate-pulse">
+                  <div className="w-full aspect-[4/5] rounded-[24px] bg-surface-container dark:bg-gray-800"></div>
+                  <div className="h-5 bg-surface-container dark:bg-gray-800 rounded w-2/3 mx-auto"></div>
+                </div>
+              ))}
+            </div>
+          ) : vendors.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-gutter">
+              {vendors.map((vendor) => (
+                <Link 
+                  key={vendor._id} 
+                  to={`/?vendor=${vendor._id}`}
+                  className="flex flex-col gap-3 group snap-start"
+                >
+                  <div className="w-full aspect-[4/5] rounded-[24px] overflow-hidden relative soft-shadow">
+                    <div 
+                      className="absolute inset-0 bg-cover bg-center w-full h-full transform group-hover:scale-110 transition-transform duration-500" 
+                      style={{ 
+                        backgroundImage: vendor.topProduct?.image 
+                          ? `url(${getImageUrl(vendor.topProduct.image)})` 
+                          : "url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=80')" 
+                      }}
+                    ></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    {vendor.topProduct && (
+                      <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full flex items-center gap-1">
+                        <span className="material-symbols-outlined text-sm text-[#F97316] icon-fill">star</span>
+                        <span className="font-label-sm text-label-sm font-bold text-white">
+                          {vendor.topProduct.averageRating.toFixed(1)}
+                        </span>
+                        <span className="text-gray-300 text-xs ml-1">({vendor.topProduct.numberOfRatings})</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-center">
+                    <h3 className="font-label-md text-label-md text-primary dark:text-white group-hover:text-[#F97316] transition-colors">{vendor.name}</h3>
+                    <p className="font-label-sm text-label-sm text-on-surface-variant dark:text-gray-400 mt-1">{vendor.totalProducts} items</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="w-16 h-16 bg-surface-container dark:bg-gray-800 rounded-full flex items-center justify-center mb-3">
+                <span className="material-symbols-outlined text-[32px] text-on-surface-variant dark:text-gray-400">store</span>
               </div>
-              <div className="text-center">
-                <h3 className="font-label-md text-label-md text-primary dark:text-white group-hover:text-[#F97316] transition-colors">Burgers</h3>
-              </div>
-            </a>
-            
-            <a href="#menu-section" className="min-w-[160px] md:min-w-[200px] flex flex-col gap-3 group snap-start">
-              <div className="w-full aspect-[4/5] rounded-[24px] overflow-hidden relative soft-shadow">
-                <div 
-                  className="absolute inset-0 bg-cover bg-center w-full h-full transform group-hover:scale-110 transition-transform duration-500" 
-                  style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBSxT-1zK7mjS80eVUS8-iW8iTQZqRjl7XrsuVhnHYsb8uF8c_RmQ-f5L7-GgVsOeCUS1Cgn-15ufVvAedwwtklm4kwZHF4fS39m-ibuOkM9f3r8DychPr5xWAEkYDzhk8Xs9Kk8Rk_pXlijEWb2TKgK4UfvcN3plM4z_kt9hykl3aeJmUiX9OHVZepoPC_jaZkqQ5H8qZtn1NIbRPEcSyqA4T5uu5mlYSqPu2E4m4W-OtMJsvkxhStL-aj3BghDEaseCZc4gfnGFk')" }}
-                ></div>
-              </div>
-              <div className="text-center">
-                <h3 className="font-label-md text-label-md text-primary dark:text-white group-hover:text-[#F97316] transition-colors">Pizza</h3>
-              </div>
-            </a>
-            
-            <a href="#menu-section" className="min-w-[160px] md:min-w-[200px] flex flex-col gap-3 group snap-start">
-              <div className="w-full aspect-[4/5] rounded-[24px] overflow-hidden relative soft-shadow">
-                <div 
-                  className="absolute inset-0 bg-cover bg-center w-full h-full transform group-hover:scale-110 transition-transform duration-500" 
-                  style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDyhnuLA8Up-tu5R0BxGJ_2RCrn7TZDqkhaWRQFlKp5hH8TEeiwRIMv0L6gZFg7nqqYdoVgV_Wqh1baGEiZxN9v2J4KZhqvdelR7nB87FJ1EN5iKVO6g7KC5urW8j0p-W9_lA_qrCAv0jNOKGDQLA8bNvDMw98hEKOaR0RRoLfN41iGIg1dXLm5JXMsjXX1ZefWOq72QjQNE0v23WBPbGPSONS7BoabSj56SsrgH41U0qIc7lnDd8Itn0tPPnpgCWFc2WiG_Nxvjd8')" }}
-                ></div>
-              </div>
-              <div className="text-center">
-                <h3 className="font-label-md text-label-md text-primary dark:text-white group-hover:text-[#F97316] transition-colors">Chinese</h3>
-              </div>
-            </a>
-            
-            <a href="#menu-section" className="min-w-[160px] md:min-w-[200px] flex flex-col gap-3 group snap-start">
-              <div className="w-full aspect-[4/5] rounded-[24px] overflow-hidden relative soft-shadow">
-                <div 
-                  className="absolute inset-0 bg-cover bg-center w-full h-full transform group-hover:scale-110 transition-transform duration-500" 
-                  style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuD5qBNQDiRiCbJ6Ndxq3cpS8Iv1-82wKiJXCYBYSeowYJjshLSnu0duqfBCXMFzrJChxEBnQi3JkOren9WvsOkW9jltBQxnP8QywHlbnlEGf6HHGrnr4qDtgqf7i9MZQdK-o_dBUKO-9o-YSejJQsj74N392YeFwZhDtvD_IUToFnTAR_RhvhjitO0BXm6nQ6UGG-8mfoEAUyNKQxk8fpDyNdYLJh68OAPvF_oYnsFH7hOnTs9tYxzXz3urezyvEnv47rbYMgp7vu0')" }}
-                ></div>
-              </div>
-              <div className="text-center">
-                <h3 className="font-label-md text-label-md text-primary dark:text-white group-hover:text-[#F97316] transition-colors">Dessert</h3>
-              </div>
-            </a>
-            
-            <a href="#menu-section" className="min-w-[160px] md:min-w-[200px] flex flex-col gap-3 group snap-start">
-              <div className="w-full aspect-[4/5] rounded-[24px] overflow-hidden relative soft-shadow">
-                <div 
-                  className="absolute inset-0 bg-cover bg-center w-full h-full transform group-hover:scale-110 transition-transform duration-500" 
-                  style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBzmGJx4fMeMuhiloVeIstycwSjhqlVeqCUB1FmPjTMvMB0cRZCdkqfj7-Mi5iWlf6OCZ_091xwaUJxITJbhJ-TFYgUyqF0-30nT2Va57DLh09hT-TdV_KoN1R8Xz0dWm1qw6i6bQf51I_-sLelXTWn-D7whCRJyRyg8LtEis3fCybLFgu_5FJNJ3RfJhM97NkwAlkO-Xb_wLSMC3xGA0L5JdRZweJdjSNZQLzmR-ArEBEum3KZzuVqljcWo_m3sEeFqGOkyarrHMw')" }}
-                ></div>
-              </div>
-              <div className="text-center">
-                <h3 className="font-label-md text-label-md text-primary dark:text-white group-hover:text-[#F97316] transition-colors">Drinks</h3>
-              </div>
-            </a>
-          </div>
+              <h3 className="font-headline-md text-headline-md text-primary dark:text-white mb-1">No Restaurants Yet</h3>
+              <p className="font-body-sm text-body-sm text-on-surface-variant dark:text-gray-400">Check back soon for new restaurants.</p>
+            </div>
+          )}
         </div>
       </section>
 
