@@ -3,10 +3,15 @@ import { Link } from 'react-router-dom';
 import MenuSection from '../components/MenuSection';
 import HeroDashboard from '../components/HeroDashboard';
 import { getVendors, getImageUrl } from '../services/vendorService';
+import { getTopRatedProducts } from '../services/productService';
+import ProductCard from '../components/ProductCard';
 
 const Home = () => {
   const [vendors, setVendors] = useState([]);
   const [vendorsLoading, setVendorsLoading] = useState(true);
+  const [topProducts, setTopProducts] = useState([]);
+  const [topProductsLoading, setTopProductsLoading] = useState(true);
+  const [topRatedCustomers, setTopRatedCustomers] = useState([]);
 
   useEffect(() => {
     const fetchVendors = async () => {
@@ -22,6 +27,36 @@ const Home = () => {
       }
     };
     fetchVendors();
+  }, []);
+
+  useEffect(() => {
+    const fetchTopRated = async () => {
+      try {
+        const data = await getTopRatedProducts();
+        if (data.success) {
+          setTopProducts(data.products);
+          // Collect customer names from those who rated the top products
+          const customers = [];
+          for (const product of data.products) {
+            if (product.ratings && product.ratings.length > 0) {
+              for (const r of product.ratings) {
+                if (r.userName && !customers.includes(r.userName)) {
+                  customers.push(r.userName);
+                }
+              }
+            }
+          }
+          // Pick 3 random if enough
+          const shuffled = customers.sort(() => 0.5 - Math.random());
+          setTopRatedCustomers(shuffled.slice(0, 3));
+        }
+      } catch (error) {
+        console.error('Error fetching top rated:', error);
+      } finally {
+        setTopProductsLoading(false);
+      }
+    };
+    fetchTopRated();
   }, []);
 
   return (
@@ -99,98 +134,41 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Popular Offerings */}
+      {/* Popular Offerings - Top Rated Products */}
       <section className="py-stack-lg px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
         <div className="text-center mb-stack-md">
           <h2 className="font-headline-xl text-headline-xl text-primary dark:text-white">Popular Offerings</h2>
           <p className="font-body-md text-body-md text-on-surface-variant dark:text-gray-400 mt-2 max-w-lg mx-auto">Curated favorites chosen by our discerning community.</p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
-          {/* Product Card 1 */}
-          <div className="bg-surface-container-lowest dark:bg-[#121414] rounded-[24px] p-4 soft-shadow border border-outline-variant/30 dark:border-gray-800 group hover:-translate-y-1 transition-transform duration-300">
-            <div className="relative h-64 rounded-[16px] overflow-hidden mb-4">
-              <div 
-                className="absolute inset-0 bg-cover bg-center w-full h-full transform group-hover:scale-105 transition-transform duration-500" 
-                style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBS9rbUr_8TcDA3w8fTcXJqIM5TA1pmtQbKGDcQ-QvIleWPFJLA9eA_lgrn5G4F0Acaj68DPbtL-Wcvy3XmH1mMUPrlmlThevnbLQ5Sr52NyPNWHHJoNZAgckyd0vwoZJn7H_uw_9N6ByKzURLjK6kaZwwK0EaAHijScqQ7ZWzN1dPYn8ExnwjHlhncNyXCrDBRVPIA5rOY8kMDUwT67_592UeXwtGTcaU6dUpmXDrcH4AEKVgVRnwbtAYHRjClAyw549YFSmfM5Vc')" }}
-              ></div>
-              <div className="absolute top-3 left-3 bg-surface-container-lowest/90 dark:bg-[#121414]/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1">
-                <span className="material-symbols-outlined text-sm text-[#F97316] icon-fill">star</span>
-                <span className="font-label-sm text-label-sm font-bold">4.9</span>
+        {topProductsLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="bg-surface-container-lowest dark:bg-[#121414] rounded-[24px] border border-outline-variant/30 dark:border-gray-800 overflow-hidden h-[340px] animate-pulse">
+                <div className="h-48 bg-surface-container dark:bg-gray-800"></div>
+                <div className="p-4">
+                  <div className="h-5 bg-surface-container dark:bg-gray-800 rounded w-1/2 mb-3"></div>
+                  <div className="h-3 bg-surface-container dark:bg-gray-800 rounded w-full mb-1"></div>
+                  <div className="h-3 bg-surface-container dark:bg-gray-800 rounded w-3/4"></div>
+                </div>
               </div>
-              <button className="absolute top-3 right-3 w-10 h-10 bg-surface-container-lowest/90 dark:bg-[#121414]/90 backdrop-blur-sm rounded-full flex items-center justify-center text-on-surface-variant dark:text-gray-400 hover:text-[#ba1a1a] transition-colors">
-                <span className="material-symbols-outlined">favorite</span>
-              </button>
-            </div>
-            <div className="flex flex-col gap-1">
-              <div className="flex justify-between items-start">
-                <h3 className="font-headline-lg text-headline-lg-mobile text-primary dark:text-white">Truffle Wagyu Burger</h3>
-                <span className="font-headline-lg text-headline-lg-mobile text-primary dark:text-white">$24</span>
-              </div>
-              <p className="font-body-md text-body-md text-on-surface-variant dark:text-gray-400 line-clamp-2">Premium wagyu patty, black truffle aioli, aged cheddar, arugula on a brioche bun.</p>
-              <a href="#menu-section" className="mt-4 w-full bg-primary text-on-primary font-label-md text-label-md py-3 rounded-xl hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
-                <span>Add to Cart</span>
-                <span className="material-symbols-outlined text-sm">add_shopping_cart</span>
-              </a>
-            </div>
+            ))}
           </div>
-          
-          {/* Product Card 2 */}
-          <div className="bg-surface-container-lowest dark:bg-[#121414] rounded-[24px] p-4 soft-shadow border border-outline-variant/30 dark:border-gray-800 group hover:-translate-y-1 transition-transform duration-300">
-            <div className="relative h-64 rounded-[16px] overflow-hidden mb-4">
-              <div 
-                className="absolute inset-0 bg-cover bg-center w-full h-full transform group-hover:scale-105 transition-transform duration-500" 
-                style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCkG1fbAsUTJH4osWnJuvs-aod65pGGRip4EhgvlKIo84y1Vf3aIyF3YFczleQ5t8K75RgZx8sqK4AK1c6tP2R1auaML-qPOr_A32ObiFTXDg_x8AxxHMkcexlIi_jdwedHQBpI24txhMVwm3JzOMCD2uTG-yXZrYcjLGlJkSaN-GqaTkCB6k6U--v7c5LG__imjl57ZL8LoLtqfJY3cFtyRKFZeGnljc09abNY-hhPzn3UJ8sZ-Qsjo7SWcUldN8RM8vk1LghmXp0')" }}
-              ></div>
-              <div className="absolute top-3 left-3 bg-surface-container-lowest/90 dark:bg-[#121414]/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1">
-                <span className="material-symbols-outlined text-sm text-[#F97316] icon-fill">star</span>
-                <span className="font-label-sm text-label-sm font-bold dark:text-white">4.8</span>
-              </div>
-              <button className="absolute top-3 right-3 w-10 h-10 bg-surface-container-lowest/90 dark:bg-[#121414]/90 backdrop-blur-sm rounded-full flex items-center justify-center text-on-surface-variant dark:text-gray-400 hover:text-[#ba1a1a] transition-colors">
-                <span className="material-symbols-outlined">favorite</span>
-              </button>
-            </div>
-            <div className="flex flex-col gap-1">
-              <div className="flex justify-between items-start">
-                <h3 className="font-headline-lg text-headline-lg-mobile text-primary dark:text-white">Artisan Margherita</h3>
-                <span className="font-headline-lg text-headline-lg-mobile text-primary dark:text-white">$18</span>
-              </div>
-              <p className="font-body-md text-body-md text-on-surface-variant dark:text-gray-400 line-clamp-2">San Marzano tomatoes, fresh mozzarella di bufala, basil, extra virgin olive oil.</p>
-              <a href="#menu-section" className="mt-4 w-full bg-primary text-on-primary font-label-md text-label-md py-3 rounded-xl hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
-                <span>Add to Cart</span>
-                <span className="material-symbols-outlined text-sm">add_shopping_cart</span>
-              </a>
-            </div>
+        ) : topProducts.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+            {topProducts.map((product) => (
+              <ProductCard key={product._id} product={product} />
+            ))}
           </div>
-          
-          {/* Product Card 3 */}
-          <div className="bg-surface-container-lowest dark:bg-[#121414] rounded-[24px] p-4 soft-shadow border border-outline-variant/30 dark:border-gray-800 group hover:-translate-y-1 transition-transform duration-300">
-            <div className="relative h-64 rounded-[16px] overflow-hidden mb-4">
-              <div 
-                className="absolute inset-0 bg-cover bg-center w-full h-full transform group-hover:scale-105 transition-transform duration-500" 
-                style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBVI1CDZ4DmUtSEBHW4KcWZl1M-VFnMsDae8n3w-gmWTiNgCGFLR6SVKh90DHOv18ECL9K-63xExl0LOyeBFRz_AG3KDozLBc5294H6V7GS50t5n0OQ5xR552dnJ5AT-PEHvbgS97A_jsAjnNCprG1X6idDpWQ9UZ4U1YKrOd_e3y6RvDby9aokCHfxfmqg1sBrsxbCY-FxFJQMjtMaDoNMhVj_CZ7YEC5Lv2KJ0yp52WYsSz6-kIiGyGEiRlTc9a3gYWQ4YEIt6iY')" }}
-              ></div>
-              <div className="absolute top-3 left-3 bg-surface-container-lowest/90 dark:bg-[#121414]/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1">
-                <span className="material-symbols-outlined text-sm text-[#F97316] icon-fill">star</span>
-                <span className="font-label-sm text-label-sm font-bold dark:text-white">4.9</span>
-              </div>
-              <button className="absolute top-3 right-3 w-10 h-10 bg-surface-container-lowest/90 dark:bg-[#121414]/90 backdrop-blur-sm rounded-full flex items-center justify-center text-on-surface-variant dark:text-gray-400 hover:text-[#ba1a1a] transition-colors">
-                <span className="material-symbols-outlined">favorite</span>
-              </button>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="w-16 h-16 bg-surface-container dark:bg-gray-800 rounded-full flex items-center justify-center mb-3">
+              <span className="material-symbols-outlined text-[32px] text-on-surface-variant dark:text-gray-400">star</span>
             </div>
-            <div className="flex flex-col gap-1">
-              <div className="flex justify-between items-start">
-                <h3 className="font-headline-lg text-headline-lg-mobile text-primary dark:text-white">Pacific Salmon Poke</h3>
-                <span className="font-headline-lg text-headline-lg-mobile text-primary dark:text-white">$21</span>
-              </div>
-              <p className="font-body-md text-body-md text-on-surface-variant dark:text-gray-400 line-clamp-2">Fresh Atlantic salmon, sushi rice, avocado, edamame, ponzu dressing, sesame.</p>
-              <a href="#menu-section" className="mt-4 w-full bg-primary text-on-primary font-label-md text-label-md py-3 rounded-xl hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
-                <span>Add to Cart</span>
-                <span className="material-symbols-outlined text-sm">add_shopping_cart</span>
-              </a>
-            </div>
+            <h3 className="font-headline-md text-headline-md text-primary dark:text-white mb-1">No Top Rated Yet</h3>
+            <p className="font-body-sm text-body-sm text-on-surface-variant dark:text-gray-400">Be the first to rate a product!</p>
           </div>
-        </div>
+        )}
       </section>
 
       {/* Testimonials */}
@@ -212,9 +190,11 @@ const Home = () => {
               </div>
               <p className="font-body-md text-body-md text-on-surface-variant dark:text-gray-300 italic">"The packaging alone feels like a luxury unboxing experience. The food arrived perfectly hot and beautifully presented. Aura Eats has ruined regular takeout for me."</p>
               <div className="flex items-center gap-3 mt-auto pt-4 border-t border-outline-variant/30 dark:border-gray-800">
-                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuANZz1EAJrNSYBxDhn4CKwlQFb9pTJEAz1DUegn63IjcV46qUAQrcSeA0vaO1GTZfB61EJ2WXoOAjz-duSp1PCMTyOe9YAFuy0jm663TSbTbgbDUPuVatpdMMzV3foZ81SuzrBL8TBkZagTAQ6zoTT8CXw1bA20y2WlAxCWRCc9Fonaq8h_kw0W_Hq7ZAOmeKC8-YdX9eYqe6aZxzT7AzdM58IZY2xEns5DAy665CwxmQipwIkviyeIabU1mHaKe40_K_NWB8hWK5o" alt="Sarah Jenkins" className="w-10 h-10 rounded-full object-cover" />
+                <div className="w-10 h-10 rounded-full bg-[#F97316]/10 flex items-center justify-center">
+                  <span className="text-sm font-bold text-[#F97316]">{topRatedCustomers[0]?.charAt(0) || 'S'}</span>
+                </div>
                 <div>
-                  <p className="font-label-md text-label-md text-primary dark:text-white">Sarah Jenkins</p>
+                  <p className="font-label-md text-label-md text-primary dark:text-white">{topRatedCustomers[0] || 'Sarah Jenkins'}</p>
                   <p className="font-label-sm text-label-sm text-on-surface-variant dark:text-gray-400">Food Critic</p>
                 </div>
               </div>
@@ -231,9 +211,11 @@ const Home = () => {
               </div>
               <p className="font-body-md text-body-md text-on-surface-variant dark:text-gray-300 italic">"Incredible attention to detail. The Wagyu burger was cooked to a perfect medium-rare, even after a 20-minute delivery. Highly recommend for date nights in."</p>
               <div className="flex items-center gap-3 mt-auto pt-4 border-t border-outline-variant/30 dark:border-gray-800">
-                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaCOwKLi4KN3vuBRm6vw21IlLXANVShTz8Q3kEsT9Z_i-EPLpDdtu5Bb9rOeuCtc5nYaY5JwgEGZgWjkV8mPR4AMD-3kvgVhD-gXxACoqFCTFr9FK2l9WASOsqSyzkxoPtiBS7ZfVHwUhiQeNY89rj6hhmrPeYC5TTzTEy_WAQzN5JPrJnPosowEsrjV4HU7hYCVxp_8XBgTRxIN6maE-dqdLXmbCjRL-nlb3U0cmVEsLkPF7zKVcP342GgHcLcVxwWu0lnP-d0ok" alt="David Chen" className="w-10 h-10 rounded-full object-cover" />
+                <div className="w-10 h-10 rounded-full bg-[#F97316]/10 flex items-center justify-center">
+                  <span className="text-sm font-bold text-[#F97316]">{topRatedCustomers[1]?.charAt(0) || 'D'}</span>
+                </div>
                 <div>
-                  <p className="font-label-md text-label-md text-primary dark:text-white">David Chen</p>
+                  <p className="font-label-md text-label-md text-primary dark:text-white">{topRatedCustomers[1] || 'David Chen'}</p>
                   <p className="font-label-sm text-label-sm text-on-surface-variant dark:text-gray-400">Regular Customer</p>
                 </div>
               </div>
@@ -250,9 +232,11 @@ const Home = () => {
               </div>
               <p className="font-body-md text-body-md text-on-surface-variant dark:text-gray-300 italic">"Finally, a delivery service that respects the food. The interface is clean, delivery is fast, and the quality of the partner restaurants is unmatched."</p>
               <div className="flex items-center gap-3 mt-auto pt-4 border-t border-outline-variant/30 dark:border-gray-800">
-                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnWl3p0dm06Hn7En0RlNtc_FeeeKyofqc_RKFMbMu4raVNtMdDIH4HbpZTKakK6WQpBkvGoMOtFjjjROAFfeg6PIZ8-njQXBa1qvtmxQkJtbti5bTqctzIJdiU1GHiPBc73w5GZ8ClZGxNzhxy0uTQNgHerByCLfa97tXvGRByjDlwTyXzchbb0IbBDk25qVAQ-TuZS6bGwY6Ci9gTjZEiyIiJ5na1xIENKP5tvN7n_CcETadvOipRE4iUZLo2IDSpiDRRH76iJWg" alt="Elena Rodriguez" className="w-10 h-10 rounded-full object-cover" />
+                <div className="w-10 h-10 rounded-full bg-[#F97316]/10 flex items-center justify-center">
+                  <span className="text-sm font-bold text-[#F97316]">{topRatedCustomers[2]?.charAt(0) || 'E'}</span>
+                </div>
                 <div>
-                  <p className="font-label-md text-label-md text-primary dark:text-white">Elena Rodriguez</p>
+                  <p className="font-label-md text-label-md text-primary dark:text-white">{topRatedCustomers[2] || 'Elena Rodriguez'}</p>
                   <p className="font-label-sm text-label-sm text-on-surface-variant dark:text-gray-400">Local Guide</p>
                 </div>
               </div>

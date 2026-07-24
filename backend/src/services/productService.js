@@ -1,4 +1,5 @@
 import Product from "../models/Product.js";
+import User from "../models/User.js";
 
 const buildSort = (sort) => {
   switch (sort) {
@@ -68,7 +69,7 @@ export const getAllProducts = async (queryParams) => {
 
 export const getProduct = async (id) => {
   return Product.findById(id)
-    .select("name description price category image stock averageRating numberOfRatings")
+    .select("name description price category image stock averageRating numberOfRatings ratings")
     .populate("vendorId");
 };
 
@@ -115,18 +116,42 @@ export const getVendorProducts = async (vendorId) => {
     .populate("vendorId");
 };
 
-export const rateProduct = async (productId, rating) => {
+export const rateProduct = async (productId, userId, rating, userName, comment = "") => {
   const product = await Product.findById(productId);
   if (!product) {
     return null;
   }
 
-  const oldTotal = product.averageRating * product.numberOfRatings;
-  const newNumberOfRatings = product.numberOfRatings + 1;
-  const newAverage = (oldTotal + rating) / newNumberOfRatings;
+  // Check if user already rated, update their rating
+  const existingIndex = product.ratings.findIndex(
+    (r) => r.userId.toString() === userId
+  );
 
-  product.averageRating = Math.round(newAverage * 10) / 10;
-  product.numberOfRatings = newNumberOfRatings;
+  if (existingIndex >= 0) {
+    product.ratings[existingIndex].rating = rating;
+    product.ratings[existingIndex].comment = comment;
+    product.ratings[existingIndex].userName = userName;
+  } else {
+    product.ratings.push({
+      userId,
+      userName,
+      rating,
+      comment,
+    });
+  }
+
+  // Recalculate average
+  const total = product.ratings.reduce((sum, r) => sum + r.rating, 0);
+  product.averageRating = Math.round((total / product.ratings.length) * 10) / 10;
+  product.numberOfRatings = product.ratings.length;
 
   return product.save();
+};
+
+export const getTopRatedProducts = async (limit = 3) => {
+  return Product.find({ status: "active" })
+    .sort({ averageRating: -1, numberOfRatings: -1 })
+    .limit(limit)
+    .select("name price image stock averageRating numberOfRatings vendorId")
+    .populate("vendorId", "name");
 };

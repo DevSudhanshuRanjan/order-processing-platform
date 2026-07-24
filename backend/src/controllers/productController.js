@@ -218,7 +218,7 @@ export const rateProduct =
   async (req, res, next) => {
     try {
       const { id } = req.params;
-      const { rating } = req.body;
+      const { rating, comment = "" } = req.body;
 
       if (!rating || rating < 1 || rating > 5) {
         return res.status(400).json({
@@ -227,7 +227,8 @@ export const rateProduct =
         });
       }
 
-      const product = await productService.rateProduct(id, Number(rating));
+      const userName = req.user.name || "Anonymous";
+      const product = await productService.rateProduct(id, req.user.id, Number(rating), userName, comment);
 
       if (!product) {
         return res.status(404).json({
@@ -241,6 +242,20 @@ export const rateProduct =
         message: "Product rated successfully",
         averageRating: product.averageRating,
         numberOfRatings: product.numberOfRatings,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+export const getTopRated =
+  async (req, res, next) => {
+    try {
+      const products = await productService.getTopRatedProducts(3);
+
+      res.status(200).json({
+        success: true,
+        products,
       });
     } catch (error) {
       next(error);

@@ -10,7 +10,12 @@ export const getProductById = async (id) => {
   return response.data.product || response.data;
 };
 
-export const rateProduct = async (id, rating) => {
-  const response = await API.post(`/products/${id}/rate`, { rating });
+export const rateProduct = async (id, rating, comment = '') => {
+  const response = await API.post(`/products/${id}/rate`, { rating, comment });
+  return response.data;
+};
+
+export const getTopRatedProducts = async () => {
+  const response = await API.get('/products/top-rated');
   return response.data;
 };

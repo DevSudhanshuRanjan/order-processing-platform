@@ -11,6 +11,7 @@ import {
   deleteProduct,
   getVendorProducts,
   rateProduct,
+  getTopRated,
 } from "../controllers/productController.js";
 
 import {
@@ -43,6 +44,15 @@ router.post(
   authMiddleware,
   roleMiddleware("customer"),
   rateProduct
+);
+
+/*
+PUBLIC - Top Rated
+*/
+
+router.get(
+  "/products/top-rated",
+  getTopRated
 );
 
 /*

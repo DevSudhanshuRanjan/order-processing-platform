@@ -8,6 +8,32 @@ const CATEGORIES = [
   "Chinese",
 ];
 
+const ratingSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    userName: {
+      type: String,
+      required: true,
+    },
+    rating: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 5,
+    },
+    comment: {
+      type: String,
+      default: "",
+      maxlength: 300,
+    },
+  },
+  { _id: false }
+);
+
 const productSchema = new mongoose.Schema(
   {
     name: {
@@ -63,6 +89,10 @@ const productSchema = new mongoose.Schema(
       type: Number,
       default: 0,
       min: 0,
+    },
+    ratings: {
+      type: [ratingSchema],
+      default: [],
     },
   },
   {
