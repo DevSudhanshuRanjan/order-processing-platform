@@ -21,7 +21,7 @@ const buildSort = (sort) => {
 };
 
 export const getAllProducts = async (queryParams) => {
-  const { search, category, sort, page = 1, limit = 8 } = queryParams;
+  const { search, category, sort, page = 1, limit = 8, vendorId } = queryParams;
 
   const query = {
     status: "active",
@@ -37,6 +37,10 @@ export const getAllProducts = async (queryParams) => {
 
   if (category) {
     query.category = category;
+  }
+
+  if (vendorId) {
+    query.vendorId = vendorId;
   }
 
   const limitNum = Number(limit);

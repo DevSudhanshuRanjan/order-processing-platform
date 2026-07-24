@@ -19,9 +19,166 @@
         } catch (e) {}
       })();
     </script>
+    <style>
+      /* GTA-style initial loading bar before React mounts */
+      #initial-loader {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: #0d0d0d;
+        transition: opacity 0.5s ease;
+      }
+      #initial-loader.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      #initial-loader .brand {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 40px;
+      }
+      #initial-loader .brand-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        background: #F97316;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #initial-loader .brand-icon svg {
+        width: 28px;
+        height: 28px;
+        fill: white;
+      }
+      #initial-loader .brand-name {
+        color: white;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      #initial-loader .brand-name span {
+        color: #F97316;
+      }
+      #initial-loader .bar-wrap {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+      #initial-loader .bar-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 32px 12px;
+      }
+      #initial-loader .bar-label-left {
+        color: rgba(255,255,255,0.3);
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        font-family: 'Inter', sans-serif;
+      }
+      #initial-loader .bar-label-right {
+        color: rgba(255,255,255,0.5);
+        font-size: 11px;
+        font-weight: 500;
+        font-family: monospace;
+      }
+      #initial-loader .bar-track {
+        height: 3px;
+        background: rgba(255,255,255,0.05);
+        width: 100%;
+      }
+      #initial-loader .bar-fill {
+        height: 100%;
+        width: 0%;
+        background: #F97316;
+        transition: width 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        position: relative;
+      }
+      #initial-loader .bar-fill::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: -2px;
+        width: 60px;
+        height: 7px;
+        background: rgba(249, 115, 22, 0.3);
+        filter: blur(6px);
+      }
+      #initial-loader .bar-edge {
+        height: 1px;
+        background: rgba(255,255,255,0.02);
+      }
+    </style>
   </head>
   <body>
+    <div id="initial-loader">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8.1 13.34l2.83-2.83L3.91 3.5c-1.56 1.56-1.56 4.09 0 5.66l4.19 4.18zm6.78-1.81c1.53.71 3.68.21 5.27-1.38 1.91-1.91 2.28-4.65.81-6.12-1.46-1.46-4.2-1.1-6.12.81-1.59 1.59-2.09 3.74-1.38 5.27L3.7 19.87l1.41 1.41L12 14.41l6.88 6.88 1.41-1.41L13.41 13l1.47-1.47z"/>
+          </svg>
+        </div>
+        <div class="brand-name">AURA<span>EATS</span></div>
+      </div>
+      <div class="bar-wrap">
+        <div class="bar-label">
+          <span class="bar-label-left">Initializing</span>
+          <span class="bar-label-right" id="progress-text">0%</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" id="bar-fill"></div>
+        </div>
+        <div class="bar-edge"></div>
+      </div>
+    </div>
+
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Animate the initial loading bar
+      (function() {
+        var fill = document.getElementById('bar-fill');
+        var text = document.getElementById('progress-text');
+        var loader = document.getElementById('initial-loader');
+        var start = performance.now();
+        var duration = 1800;
+        
+        function animate() {
+          var elapsed = performance.now() - start;
+          var t = Math.min(elapsed / duration, 1);
+          // Ease out cubic
+          var progress = 1 - Math.pow(1 - t, 3);
+          var pct = Math.round(progress * 100);
+          if (fill) fill.style.width = progress * 100 + '%';
+          if (text) text.textContent = pct + '%';
+          
+          if (t < 1) {
+            requestAnimationFrame(animate);
+          }
+        }
+        requestAnimationFrame(animate);
+        
+        // Hide loader once React mounts (detected by root having content)
+        var observer = new MutationObserver(function() {
+          var root = document.getElementById('root');
+          if (root && root.children.length > 0) {
+            loader.classList.add('hidden');
+            observer.disconnect();
+          }
+        });
+        observer.observe(document.getElementById('root'), { childList: true, subtree: true });
+      })();
+    </script>
   </body>
 </html>

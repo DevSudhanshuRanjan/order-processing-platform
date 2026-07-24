@@ -57,7 +57,7 @@ const Home = () => {
               {vendors.map((vendor) => (
                 <Link 
                   key={vendor._id} 
-                  to={`/?vendor=${vendor._id}`}
+                  to={`/restaurant/${vendor._id}`}
                   className="flex flex-col gap-3 group snap-start"
                 >
                   <div className="w-full aspect-[4/5] rounded-[24px] overflow-hidden relative soft-shadow">
@@ -74,7 +74,7 @@ const Home = () => {
                       <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm px-2.5 py-1 rounded-full flex items-center gap-1">
                         <span className="material-symbols-outlined text-sm text-[#F97316] icon-fill">star</span>
                         <span className="font-label-sm text-label-sm font-bold text-white">
-                          {vendor.topProduct.averageRating.toFixed(1)}
+                          {vendor.topProduct.averageRating ? vendor.topProduct.averageRating.toFixed(1) : '0.0'}
                         </span>
                         <span className="text-gray-300 text-xs ml-1">({vendor.topProduct.numberOfRatings})</span>
                       </div>

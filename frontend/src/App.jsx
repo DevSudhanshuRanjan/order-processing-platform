@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Lenis from 'lenis';
@@ -9,11 +9,13 @@ import { RoleRoute } from './routes/RoleRoute';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import VendorSwitchModal from './components/VendorSwitchModal';
+import LoadingScreen from './components/LoadingScreen';
 
 // Public Pages
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import VendorMenu from './pages/VendorMenu';
 
 // Customer Pages
 import ProductDetails from './pages/ProductDetails';
@@ -31,66 +33,73 @@ import AdminDashboard from './pages/Admin';
 function AppContent() {
   const location = useLocation();
   const isDashboard = location.pathname.startsWith('/vendor') || location.pathname.startsWith('/admin');
+  const [appReady, setAppReady] = useState(false);
 
   return (
     <>
-      {!isDashboard && <Navbar />}
-      <VendorSwitchModal />
-      <main className="flex-grow">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          
-          {/* Customer Routes */}
-          {/* Products is now embedded in Home page (SPA) */}
-          <Route path="/product/:id" element={<ProductDetails />} />
-          <Route 
-            path="/cart" 
-            element={<ProtectedRoute><Cart /></ProtectedRoute>} 
-          />
-          <Route 
-            path="/checkout" 
-            element={<ProtectedRoute><Checkout /></ProtectedRoute>} 
-          />
-          <Route 
-            path="/orders" 
-            element={<ProtectedRoute><Orders /></ProtectedRoute>} 
-          />
-          <Route 
-            path="/order-success" 
-            element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} 
-          />
-          <Route 
-            path="/profile" 
-            element={<ProtectedRoute><Profile /></ProtectedRoute>} 
-          />
+      {!appReady && <LoadingScreen onFinish={() => setAppReady(true)} />}
+      {appReady && (
+        <>
+          {!isDashboard && <Navbar />}
+          <VendorSwitchModal />
+          <main className="flex-grow">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/restaurant/:vendorId" element={<VendorMenu />} />
+              
+              {/* Customer Routes */}
+              {/* Products is now embedded in Home page (SPA) */}
+              <Route path="/product/:id" element={<ProductDetails />} />
+              <Route 
+                path="/cart" 
+                element={<ProtectedRoute><Cart /></ProtectedRoute>} 
+              />
+              <Route 
+                path="/checkout" 
+                element={<ProtectedRoute><Checkout /></ProtectedRoute>} 
+              />
+              <Route 
+                path="/orders" 
+                element={<ProtectedRoute><Orders /></ProtectedRoute>} 
+              />
+              <Route 
+                path="/order-success" 
+                element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} 
+              />
+              <Route 
+                path="/profile" 
+                element={<ProtectedRoute><Profile /></ProtectedRoute>} 
+              />
 
-          {/* Vendor Routes */}
-          <Route 
-            path="/vendor/*" 
-            element={
-              <RoleRoute allowedRoles={['vendor']}>
-                <VendorDashboard />
-              </RoleRoute>
-            } 
-          />
+              {/* Vendor Routes */}
+              <Route 
+                path="/vendor/*" 
+                element={
+                  <RoleRoute allowedRoles={['vendor']}>
+                    <VendorDashboard />
+                  </RoleRoute>
+                } 
+              />
 
-          {/* Admin Routes */}
-          <Route 
-            path="/admin/*" 
-            element={
-              <RoleRoute allowedRoles={['admin']}>
-                <AdminDashboard />
-              </RoleRoute>
-            } 
-          />
+              {/* Admin Routes */}
+              <Route 
+                path="/admin/*" 
+                element={
+                  <RoleRoute allowedRoles={['admin']}>
+                    <AdminDashboard />
+                  </RoleRoute>
+                } 
+              />
 
-          {/* 404 Route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </main>
-      {!isDashboard && <Footer />}
+              {/* 404 Route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
+          {!isDashboard && <Footer />}
+        </>
+      )}
     </>
   );
 }

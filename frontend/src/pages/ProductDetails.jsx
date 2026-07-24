@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getProductById, rateProduct } from '../services/productService';
+import { getImageUrl } from '../services/vendorService';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
@@ -16,12 +17,18 @@ const ProductDetails = () => {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [vendorName, setVendorName] = useState('');
 
-  useEffect(() => {
+    useEffect(() => {
     const fetchProduct = async () => {
       try {
         const data = await getProductById(id);
         setProduct(data);
+        if (data.vendorId && typeof data.vendorId === 'object') {
+          setVendorName(data.vendorId.name);
+        } else if (data.vendorId && data.vendor) {
+          setVendorName(data.vendor.name);
+        }
       } catch (error) {
         toast.error('Product not found');
         navigate('/products');
@@ -108,7 +115,17 @@ const ProductDetails = () => {
                 <span className="font-headline-lg text-headline-lg text-primary dark:text-white">₹{product.price}</span>
               </div>
               
-              <div className="flex items-center gap-2 mb-stack-md">
+                {vendorName && product.vendorId && (
+                  <Link
+                    to={`/restaurant/${typeof product.vendorId === 'object' ? product.vendorId._id : product.vendorId}`}
+                    className="inline-flex items-center gap-2 text-on-surface-variant dark:text-gray-400 hover:text-[#F97316] dark:hover:text-[#F97316] transition-colors font-label-sm text-label-sm mb-3"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">store</span>
+                    View full menu from {vendorName}
+                    <span className="material-symbols-outlined text-[14px]">chevron_right</span>
+                  </Link>
+                )}
+                <div className="flex items-center gap-2 mb-stack-md">
                 <RatingStars
                   rating={product.averageRating || 0}
                   count={product.numberOfRatings || 0}
