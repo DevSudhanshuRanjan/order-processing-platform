@@ -43,7 +43,7 @@ export const getAllProducts = async (queryParams) => {
   const pageNum = Number(page);
 
   const products = await Product.find(query)
-    .select("name price category image stock status")
+    .select("name price category image stock status averageRating numberOfRatings")
     .populate("vendorId")
     .sort(buildSort(sort))
     .skip((pageNum - 1) * limitNum)
@@ -64,7 +64,7 @@ export const getAllProducts = async (queryParams) => {
 
 export const getProduct = async (id) => {
   return Product.findById(id)
-    .select("name description price category image stock")
+    .select("name description price category image stock averageRating numberOfRatings")
     .populate("vendorId");
 };
 
@@ -107,6 +107,22 @@ export const getVendorProducts = async (vendorId) => {
   return Product.find({
     vendorId,
   })
-    .select("name price stock status image")
+    .select("name price stock status image averageRating numberOfRatings")
     .populate("vendorId");
+};
+
+export const rateProduct = async (productId, rating) => {
+  const product = await Product.findById(productId);
+  if (!product) {
+    return null;
+  }
+
+  const oldTotal = product.averageRating * product.numberOfRatings;
+  const newNumberOfRatings = product.numberOfRatings + 1;
+  const newAverage = (oldTotal + rating) / newNumberOfRatings;
+
+  product.averageRating = Math.round(newAverage * 10) / 10;
+  product.numberOfRatings = newNumberOfRatings;
+
+  return product.save();
 };

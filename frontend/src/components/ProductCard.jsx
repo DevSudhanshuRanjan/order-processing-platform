@@ -3,6 +3,7 @@ import { useCart } from "../contexts/CartContext";
 import { useAuth } from "../contexts/AuthContext";
 import { getImageUrl } from "../services/vendorService";
 import toast from "react-hot-toast";
+import RatingStars from "./RatingStars";
 
 const ProductCard = ({ product, compact = false }) => {
   const { addToCart } = useCart();
@@ -75,6 +76,15 @@ const ProductCard = ({ product, compact = false }) => {
         }`}>
           {product.description}
         </p>
+
+        {/* Rating */}
+        <div className="flex items-center">
+          <RatingStars
+            rating={product.averageRating || 0}
+            count={product.numberOfRatings || 0}
+            size="small"
+          />
+        </div>
 
         {/* Price + Add Button Row */}
         <div className="flex items-center justify-between gap-3 mt-auto pt-2">

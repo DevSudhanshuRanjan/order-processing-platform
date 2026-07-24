@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getProductById } from '../services/productService';
+import { getProductById, rateProduct } from '../services/productService';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
+import RatingStars from '../components/RatingStars';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -108,14 +109,24 @@ const ProductDetails = () => {
               </div>
               
               <div className="flex items-center gap-2 mb-stack-md">
-                <div className="flex text-[#F59E0B]">
-                  <span className="material-symbols-outlined filled" style={{ fontSize: '20px' }}>star</span>
-                  <span className="material-symbols-outlined filled" style={{ fontSize: '20px' }}>star</span>
-                  <span className="material-symbols-outlined filled" style={{ fontSize: '20px' }}>star</span>
-                  <span className="material-symbols-outlined filled" style={{ fontSize: '20px' }}>star</span>
-                  <span className="material-symbols-outlined filled" style={{ fontSize: '20px' }}>star_half</span>
-                </div>
-                <span className="font-label-md text-label-md text-on-surface-variant dark:text-gray-400">4.9</span>
+                <RatingStars
+                  rating={product.averageRating || 0}
+                  count={product.numberOfRatings || 0}
+                  size="medium"
+                  onRate={isLoggedIn && role === 'customer' ? async (rating) => {
+                    try {
+                      const result = await rateProduct(product._id, rating);
+                      setProduct(prev => ({
+                        ...prev,
+                        averageRating: result.averageRating,
+                        numberOfRatings: result.numberOfRatings,
+                      }));
+                      toast.success('Thank you for rating!');
+                    } catch {
+                      toast.error('Failed to submit rating');
+                    }
+                  } : undefined}
+                />
               </div>
               
               <p className="font-body-md text-body-md text-on-surface-variant dark:text-gray-300 mb-stack-lg leading-relaxed">

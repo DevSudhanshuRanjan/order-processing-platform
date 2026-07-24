@@ -10,6 +10,7 @@ import {
   updateProduct,
   deleteProduct,
   getVendorProducts,
+  rateProduct,
 } from "../controllers/productController.js";
 
 import {
@@ -31,6 +32,17 @@ router.get(
 router.get(
   "/products/:id",
   getProductById
+);
+
+/*
+CUSTOMER - Rating
+*/
+
+router.post(
+  "/products/:id/rate",
+  authMiddleware,
+  roleMiddleware("customer"),
+  rateProduct
 );
 
 /*
